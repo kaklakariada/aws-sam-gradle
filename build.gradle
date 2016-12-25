@@ -16,4 +16,15 @@ dependencies {
     compile "com.amazonaws:aws-java-sdk-s3:$awsApiVersion"
     compile "com.amazonaws:aws-java-sdk-cloudformation:$awsApiVersion"
     compile "com.amazonaws:aws-java-sdk-sts:$awsApiVersion"
+    
+    testCompile 'junit:junit:4.12'
+}
+
+gradlePlugin {
+    plugins {
+        samDeployPlugin {
+            id = "com.github.kaklakariada.aws-sam-deploy"
+            implementationClass = "com.github.kaklakariada.aws.sam.AwsSamDeployPlugin"
+        }
+    }
 }

@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+    id 'com.github.kaklakariada.aws-sam-deploy'
+}
+
+repositories {
+    jcenter()
+}
+
+version = '0.0.1'
+
+sam {
+    currentStage = 'test'
+    defaultAwsProfile = 'default'
+    defaultAwsRegion = awsRegion
+    defaultDeploymentBucket = awsDeploymentBucket
+    stages {
+        test {
+        }
+        prelive {
+        }
+    }
+    api {
+        stackBaseName = project.name
+        samTemplate = file('template.yml')
+    }
+}
+
+dependencies {
+    compile 'com.amazonaws:aws-lambda-java-core:1.1.0'
+}
