@@ -1,0 +1,16 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Minimal serverless application for testing deployment
+Resources:
+  GetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: hello.HelloHandler
+      Runtime: java8
+      CodeUri: ${CodeUri}
+      Events:
+        GetRequest:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get

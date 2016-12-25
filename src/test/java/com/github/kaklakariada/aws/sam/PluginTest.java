@@ -14,8 +14,11 @@ public class PluginTest {
 	@Test
 	public void test() {
 		final BuildResult buildResult = GradleRunner.create()
-				.withProjectDir(new File("example-project-minimal").getAbsoluteFile()).withArguments("deploy", "-is")
-				.withPluginClasspath().build();
+				.withProjectDir(new File("example-project-minimal").getAbsoluteFile()) //
+				.withPluginClasspath() //
+				.withArguments("deploy", "-is") //
+				.withDebug(true) //
+				.build();
 		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
 	}
 }
