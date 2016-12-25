@@ -1,0 +1,19 @@
+plugins {
+    id "java-gradle-plugin"
+}
+
+repositories {
+   jcenter()
+}
+
+version = '0.0.0'
+
+ext {
+  awsApiVersion = '1.11.69'
+}
+
+dependencies {
+    compile "com.amazonaws:aws-java-sdk-s3:$awsApiVersion"
+    compile "com.amazonaws:aws-java-sdk-cloudformation:$awsApiVersion"
+    compile "com.amazonaws:aws-java-sdk-sts:$awsApiVersion"
+}
