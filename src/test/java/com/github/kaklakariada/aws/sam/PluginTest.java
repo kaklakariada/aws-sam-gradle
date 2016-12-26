@@ -18,6 +18,7 @@ public class PluginTest {
 				.withPluginClasspath() //
 				.withArguments("deploy", "-is") //
 				.withDebug(true) //
+				.forwardOutput() //
 				.build();
 		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
 	}
