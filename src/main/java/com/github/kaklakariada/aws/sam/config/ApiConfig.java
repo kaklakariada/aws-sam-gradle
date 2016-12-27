@@ -9,6 +9,7 @@ public class ApiConfig {
 
 	@Override
 	public String toString() {
-		return "ApiConfig [samTemplate=" + samTemplate + ", swaggerDefinition=" + swaggerDefinition + "]";
+		return "ApiConfig [samTemplate=" + samTemplate + ", swaggerDefinition=" + swaggerDefinition + ", stackBaseName="
+				+ stackBaseName + "]";
 	}
 }

@@ -9,4 +9,10 @@ public class Stage {
 	public Stage(String name) {
 		this.name = name;
 	}
+
+	@Override
+	public String toString() {
+		return "Stage [name=" + name + ", awsRegion=" + awsRegion + ", awsProfile=" + awsProfile + ", deploymentBucket="
+				+ deploymentBucket + "]";
+	}
 }

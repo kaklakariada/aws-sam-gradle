@@ -30,13 +30,14 @@ public class AwsSamDeployPlugin implements Plugin<Project> {
 	private static final Logger LOG = Logging.getLogger(AwsSamDeployPlugin.class);
 	private static final String TASK_GROUP = "deploy";
 	private Project project;
+	private SamConfig config;
 
 	@Override
 	public void apply(Project project) {
 		LOG.info("Initialize AwsSam plugin...");
 		this.project = project;
-		final SamConfig config = createConfigDsl();
-		project.afterEvaluate((p) -> createTasks(config));
+		this.config = createConfigDsl();
+		project.afterEvaluate((p) -> createTasks());
 	}
 
 	private SamConfig createConfigDsl() {
@@ -47,19 +48,19 @@ public class AwsSamDeployPlugin implements Plugin<Project> {
 		return samConfig;
 	}
 
-	private void createTasks(final SamConfig config) {
+	private void createTasks() {
 		LOG.debug("Creating tasks");
 		final Zip zipTask = createBuildZipTask();
-		final S3UploadTask uploadZipTask = createUploadZipTask(config, zipTask);
+		final S3UploadTask uploadZipTask = createUploadZipTask(zipTask);
 		S3UploadTask uploadSwaggerTask = null;
 		if (config.api.swaggerDefinition != null) {
-			final ReplacePlaceholerTask updateSwaggerTask = createUpdateSwaggerTask(config);
-			uploadSwaggerTask = createUploadSwaggerTask(config, updateSwaggerTask);
+			final ReplacePlaceholerTask updateSwaggerTask = createUpdateSwaggerTask();
+			uploadSwaggerTask = createUploadSwaggerTask(updateSwaggerTask);
 		}
-		createDeployTask(config, uploadZipTask, uploadSwaggerTask);
+		createDeployTask(uploadZipTask, uploadSwaggerTask);
 	}
 
-	private DeployTask createDeployTask(SamConfig config, S3UploadTask uploadZipTask, S3UploadTask uploadSwaggerTask) {
+	private DeployTask createDeployTask(S3UploadTask uploadZipTask, S3UploadTask uploadSwaggerTask) {
 		final DeployTask task = createTask("deploy", DeployTask.class);
 		task.setDescription("Deploy stack to AWS");
 		task.setGroup(TASK_GROUP);
@@ -74,7 +75,7 @@ public class AwsSamDeployPlugin implements Plugin<Project> {
 		return task;
 	}
 
-	private ReplacePlaceholerTask createUpdateSwaggerTask(final SamConfig config) {
+	private ReplacePlaceholerTask createUpdateSwaggerTask() {
 		final ReplacePlaceholerTask task = createTask("updateSwagger", ReplacePlaceholerTask.class);
 		final AwsMetadataService awsMetadataService = new AwsMetadataService(config);
 		task.parameters = asList(
@@ -85,7 +86,7 @@ public class AwsSamDeployPlugin implements Plugin<Project> {
 		return task;
 	}
 
-	private S3UploadTask createUploadZipTask(final SamConfig config, final Zip zipTask) {
+	private S3UploadTask createUploadZipTask(final Zip zipTask) {
 		final S3UploadTask task = createTask("uploadZip", S3UploadTask.class);
 		task.setDescription("Upload lambda zip to s3");
 		task.setGroup(TASK_GROUP);
@@ -95,7 +96,7 @@ public class AwsSamDeployPlugin implements Plugin<Project> {
 		return task;
 	}
 
-	private S3UploadTask createUploadSwaggerTask(final SamConfig config, final ReplacePlaceholerTask updateTask) {
+	private S3UploadTask createUploadSwaggerTask(final ReplacePlaceholerTask updateTask) {
 		final S3UploadTask task = createTask("uploadSwager", S3UploadTask.class);
 		task.setDescription("Upload swagger definition to s3");
 		task.setGroup(TASK_GROUP);

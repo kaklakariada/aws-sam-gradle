@@ -11,15 +11,22 @@ import org.junit.Test;
 
 public class PluginTest {
 
+	private static final File MINIMAL_PROJECECT = new File("example-project-minimal");
+	private static final String STAGE = "test";
+
 	@Test
-	public void test() {
-		final BuildResult buildResult = GradleRunner.create()
-				.withProjectDir(new File("example-project-minimal").getAbsoluteFile()) //
+	public void testBuildSuccess() {
+		final BuildResult buildResult = runBuild(MINIMAL_PROJECECT, //
+				"-Pstage" + STAGE, "deploy", "--info", "--stacktrace");
+		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
+	}
+
+	private BuildResult runBuild(File projectDir, String... arguments) {
+		final BuildResult buildResult = GradleRunner.create().withProjectDir(projectDir.getAbsoluteFile()) //
 				.withPluginClasspath() //
-				.withArguments("deploy", "-is") //
-				.withDebug(true) //
+				.withArguments(arguments) //
 				.forwardOutput() //
 				.build();
-		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
+		return buildResult;
 	}
 }

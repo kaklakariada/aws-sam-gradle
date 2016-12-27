@@ -1,5 +1,7 @@
 package com.github.kaklakariada.aws.sam.config;
 
+import java.util.Objects;
+
 import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
 
@@ -15,7 +17,6 @@ public class SamConfig {
 
 	public String currentStage;
 	public ApiConfig api;
-
 	public String defaultAwsRegion;
 	public String defaultAwsProfile;
 	public String defaultDeploymentBucket;
@@ -31,7 +32,7 @@ public class SamConfig {
 	}
 
 	private Stage getStage() {
-		return stages.getByName(currentStage);
+		return stages.getByName(Objects.requireNonNull(currentStage, "currentStage"));
 	}
 
 	public String getStackName() {
@@ -63,6 +64,9 @@ public class SamConfig {
 
 	@Override
 	public String toString() {
-		return "SamConfig [stages=" + stages + ", currentStage=" + currentStage + ", api=" + api + "]";
+		return "SamConfig [stages=" + stages + ", deploymentTimestamp=" + deploymentTimestamp + ", projct=" + projct
+				+ ", currentStage=" + currentStage + ", api=" + api + ", defaultAwsRegion=" + defaultAwsRegion
+				+ ", defaultAwsProfile=" + defaultAwsProfile + ", defaultDeploymentBucket=" + defaultDeploymentBucket
+				+ "]";
 	}
 }
