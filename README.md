@@ -7,7 +7,7 @@ Gradle plugin for deploying Serverless Java applications using AWS [Serverless A
 ```gradle
 plugins {
     id 'java'
-    id 'com.github.kaklakariada.aws-sam-deploy' version '0.0.1'
+    id 'com.github.kaklakariada.aws-sam-deploy' version '0.0.2'
 }
 ```
 2. Configure your AWS credentials in `~/.aws/`, see https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files
@@ -16,14 +16,18 @@ plugins {
 5. Add a `serverless` section to your build script
 ```gradle
 serverless {
-    currentStage = 'test'
+    currentStage = project.hasProperty('stage') ? project.properties['stage'] : 'test'
     defaultAwsProfile = 'default'
-    defaultAwsRegion = 'eu-west-1'
-    defaultDeploymentBucket = 'my-deployment-bucket'
+    defaultAwsRegion = awsRegion
+    defaultDeploymentBucket = awsDeploymentBucket
     stages {
         test {
+            // use default values
         }
         prelive {
+            awsRegion = 'eu-west-1'
+            awsProfile = 'default'
+            deploymentBucket = awsDeploymentBucket
         }
     }
     api {
@@ -32,4 +36,4 @@ serverless {
     }
 }
 ```
-6. Deploy your app with `./gradlew deploy -i`
+6. Deploy your app with `./gradlew -Pstage=<myStage> deploy -i`

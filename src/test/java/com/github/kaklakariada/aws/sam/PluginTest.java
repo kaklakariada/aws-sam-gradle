@@ -11,12 +11,12 @@ import org.junit.Test;
 
 public class PluginTest {
 
-	private static final File MINIMAL_PROJECECT = new File("example-project-minimal");
 	private static final String STAGE = "test";
+	private static final File MINIMAL_PROJECECT_DIR = new File("example-project-minimal");
 
 	@Test
 	public void testBuildSuccess() {
-		final BuildResult buildResult = runBuild(MINIMAL_PROJECECT, //
+		final BuildResult buildResult = runBuild(MINIMAL_PROJECECT_DIR, //
 				"-Pstage" + STAGE, "deploy", "--info", "--stacktrace");
 		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
 	}
