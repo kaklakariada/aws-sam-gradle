@@ -1,15 +1,18 @@
 plugins {
-    id "java-gradle-plugin"
+    id 'java-gradle-plugin'
+    id "com.gradle.plugin-publish" version "0.9.7"
 }
 
 repositories {
    jcenter()
 }
 
-version = '0.0.0'
+version = '0.0.1'
+group = 'com.github.kaklakariada.aws'
 
 ext {
   awsApiVersion = '1.11.69'
+  gradlePluginId = 'com.github.kaklakariada.aws-sam-deploy'
 }
 
 dependencies {
@@ -22,9 +25,30 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        samDeployPlugin {
-            id = "com.github.kaklakariada.aws-sam-deploy"
-            implementationClass = "com.github.kaklakariada.aws.sam.AwsSamDeployPlugin"
+        awsSamDeployPlugin {
+            id = gradlePluginId
+            implementationClass = 'com.github.kaklakariada.aws.sam.AwsSamDeployPlugin'
         }
+    }
+}
+
+pluginBundle {
+  website = 'https://github.com/kaklakariada/aws-sam-gradle/blob/master/README.md'
+  vcsUrl = 'https://github.com/kaklakariada/aws-sam-gradle'
+  description = 'Gradle plugin for deploying AWS Serverless Application Models using CloudFormation'
+  tags = ['aws', 'serverless', 'serverless application model', 'sam',
+          'cloudformation', 'deployment', 'api gateway', 'lambda']
+
+  plugins {
+    awsSamDeployPlugin {
+      id = gradlePluginId
+      displayName = 'AWS serverless deployment plugin'
+    }
+  }
+}
+
+test {
+    testLogging {
+        showStandardStreams = true
     }
 }
