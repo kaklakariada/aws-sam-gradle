@@ -13,7 +13,10 @@ plugins {
 2. Configure your AWS credentials in `~/.aws/`, see https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files
 3. Create a SAM cloud formation template, see https://github.com/awslabs/serverless-application-model
 4. Optionally: create a swagger interface definition, see http://swagger.io/specification/
-5. Add a `serverless` section to your build script
+5. Create file `gradle.properties` in your project dir with the following entries:
+  * `awsDeploymentBucket`: Bucket used for uploading lambda code and swagger definition, e.g. `my-deployment-bucket`
+  * `awsRegion`: AWS region in which to deploy your application, e.g. `eu-west-1`
+6. Add a `serverless` section to your build script
 ```gradle
 ext {
     deployStage = project.hasProperty('stage') ? project.properties['stage'] : 'test'
@@ -30,8 +33,8 @@ serverless {
         }
         prelive {
             awsRegion = 'eu-west-1'
-            awsProfile = 'default'
-            deploymentBucket = awsDeploymentBucket
+            awsProfile = 'prelive-profile'
+            deploymentBucket = 'prelive-bucket'
         }
     }
     api {
@@ -40,4 +43,7 @@ serverless {
     }
 }
 ```
-6. Deploy your app with `./gradlew -Pstage=<myStage> deploy -i`
+7. Deploy your app with `./gradlew -Pstage=<myStage> deploy -i`
+
+## Example projects
+* [https://github.com/kaklakariada/aws-sam-gradle/tree/master/example-project-minimal](example-project-minimal): minimal project without swagger definition

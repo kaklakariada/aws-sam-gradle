@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'com.github.kaklakariada.aws-sam-deploy' version '0.0.2'
+    id 'com.github.kaklakariada.aws-sam-deploy' version '0.0.3'
 }
 
 repositories {
@@ -24,8 +24,8 @@ serverless {
         }
         prelive {
             awsRegion = 'eu-west-1'
-            awsProfile = 'default'
-            deploymentBucket = awsDeploymentBucket
+            awsProfile = 'prelive-profile'
+            deploymentBucket = 'prelive-bucket'
         }
     }
     api {
