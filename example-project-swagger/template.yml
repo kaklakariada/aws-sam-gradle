@@ -1,7 +1,17 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Minimal serverless application for testing deployment
+Description: Minimal serverless application with swagger definition for testing deployment
+
 Resources:
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      DefinitionUri: ${DefinitionUri}
+      StageName: ${stage}
+      Variables:
+        GetLambdaFunctionName: !Ref GetFunction
+        stage: ${stage}
+
   GetFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -12,5 +22,18 @@ Resources:
         GetRequest:
           Type: Api
           Properties:
+            RestApiId: !Ref ApiGatewayApi
             Path: /hello
-            Method: get
+            Method: ANY
+
+Outputs:
+  ApiUrl:
+    Description: API endpoint URL
+    Value: !Join
+      - ''
+      - - https://
+        - !Ref ApiGatewayApi
+        - '.execute-api.'
+        - !Ref 'AWS::Region'
+        - '.amazonaws.com/'
+        - '${stage}'

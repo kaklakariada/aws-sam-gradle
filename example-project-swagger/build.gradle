@@ -31,6 +31,7 @@ serverless {
     api {
         stackName = "${project.name}-${deployStage}"
         samTemplate = file('template.yml')
+        swaggerDefinition = file('swagger.yaml')
     }
 }
 
