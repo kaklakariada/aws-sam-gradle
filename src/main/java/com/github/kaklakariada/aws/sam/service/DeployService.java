@@ -56,6 +56,8 @@ public class DeployService {
 		if (swaggerDefinitionUri != null) {
 			parameters.add(new Parameter().withParameterKey("DefinitionUri").withParameterValue(swaggerDefinitionUri));
 		}
-		return templateService.replaceParameters(templateBody, parameters);
+		final String newTemplateBody = templateService.replaceParameters(templateBody, parameters);
+		templateService.writeFile(newTemplateBody, config.getBuildDir().resolve("updated-template.yaml"));
+		return newTemplateBody;
 	}
 }

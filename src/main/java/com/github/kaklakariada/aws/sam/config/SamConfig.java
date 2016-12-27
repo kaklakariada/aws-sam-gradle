@@ -1,5 +1,6 @@
 package com.github.kaklakariada.aws.sam.config;
 
+import java.nio.file.Path;
 import java.util.Objects;
 
 import org.gradle.api.NamedDomainObjectContainer;
@@ -36,7 +37,11 @@ public class SamConfig {
 	}
 
 	public String getStackName() {
-		return api.stackBaseName + "-" + getStage().name;
+		return api.stackName;
+	}
+
+	public Path getBuildDir() {
+		return projct.getBuildDir().toPath().toAbsolutePath();
 	}
 
 	public Regions getRegion() {

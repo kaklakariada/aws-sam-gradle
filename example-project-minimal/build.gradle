@@ -9,8 +9,12 @@ repositories {
 
 version = '0.0.1'
 
+ext {
+    deployStage = project.hasProperty('stage') ? project.properties['stage'] : 'test'
+}
+
 serverless {
-    currentStage = project.hasProperty('stage') ? project.properties['stage'] : 'test'
+    currentStage = deployStage
     defaultAwsProfile = 'default'
     defaultAwsRegion = awsRegion
     defaultDeploymentBucket = awsDeploymentBucket
@@ -25,7 +29,7 @@ serverless {
         }
     }
     api {
-        stackBaseName = project.name
+        stackName = "${project.name}-${deployStage}"
         samTemplate = file('template.yml')
     }
 }

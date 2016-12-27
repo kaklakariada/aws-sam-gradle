@@ -5,11 +5,11 @@ import java.io.File;
 public class ApiConfig {
 	public File samTemplate;
 	public File swaggerDefinition;
-	public String stackBaseName;
+	public String stackName;
 
 	@Override
 	public String toString() {
-		return "ApiConfig [samTemplate=" + samTemplate + ", swaggerDefinition=" + swaggerDefinition + ", stackBaseName="
-				+ stackBaseName + "]";
+		return "ApiConfig [samTemplate=" + samTemplate + ", swaggerDefinition=" + swaggerDefinition + ", stackName="
+				+ stackName + "]";
 	}
 }
