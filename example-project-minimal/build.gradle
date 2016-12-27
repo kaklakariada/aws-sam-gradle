@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'com.github.kaklakariada.aws-sam-deploy'
+    id 'com.github.kaklakariada.aws-sam-deploy' version '0.0.1'
 }
 
 repositories {
@@ -9,7 +9,7 @@ repositories {
 
 version = '0.0.1'
 
-sam {
+serverless {
     currentStage = 'test'
     defaultAwsProfile = 'default'
     defaultAwsRegion = awsRegion

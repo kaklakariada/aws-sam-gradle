@@ -30,10 +30,6 @@ public class SamConfig {
 		api = (ApiConfig) projct.configure(new ApiConfig(), config);
 	}
 
-	public Project getProjct() {
-		return projct;
-	}
-
 	private Stage getStage() {
 		return stages.getByName(currentStage);
 	}
