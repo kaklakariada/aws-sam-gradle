@@ -7,7 +7,7 @@ import java.time.Instant;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
-import org.gradle.api.tasks.Nested;
+import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
 
 import com.amazonaws.services.s3.AmazonS3;
@@ -30,7 +30,7 @@ public class S3UploadTask extends DefaultTask {
 		upload(s3Client, calculateS3Key());
 	}
 
-	@Nested
+	@Internal
 	public String getS3Url() {
 		return "s3://" + config.getDeploymentBucket() + "/" + calculateS3Key();
 	}
