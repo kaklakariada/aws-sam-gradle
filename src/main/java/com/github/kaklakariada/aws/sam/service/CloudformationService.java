@@ -1,10 +1,7 @@
 package com.github.kaklakariada.aws.sam.service;
 
-import java.time.Duration;
-import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Supplier;
 
 import org.gradle.api.logging.Logging;
 import org.slf4j.Logger;
@@ -16,6 +13,7 @@ import com.amazonaws.services.cloudformation.model.Capability;
 import com.amazonaws.services.cloudformation.model.ChangeSetType;
 import com.amazonaws.services.cloudformation.model.CreateChangeSetRequest;
 import com.amazonaws.services.cloudformation.model.CreateChangeSetResult;
+import com.amazonaws.services.cloudformation.model.DeleteStackRequest;
 import com.amazonaws.services.cloudformation.model.DescribeChangeSetRequest;
 import com.amazonaws.services.cloudformation.model.DescribeChangeSetResult;
 import com.amazonaws.services.cloudformation.model.DescribeStacksRequest;
@@ -83,7 +81,7 @@ public class CloudformationService {
 
 	public void waitForChangeSetReady(String changeSetArn) {
 		LOG.info("Waiting for change set {}", changeSetArn);
-		final StatusPoller statusPoller = new StatusPoller(() -> getChangeSetStatus(changeSetArn).getStatus(),
+		final StatusPoller statusPoller = StatusPoller.create(() -> getChangeSetStatus(changeSetArn).getStatus(),
 				() -> getChangeSetStatus(changeSetArn).getStatusReason());
 		statusPoller.waitUntilFinished();
 	}
@@ -94,7 +92,7 @@ public class CloudformationService {
 
 	public void waitForStackReady() {
 		LOG.info("Waiting for stack {}", config.getStackName());
-		final StatusPoller statusPoller = new StatusPoller(() -> {
+		final StatusPoller statusPoller = StatusPoller.create(() -> {
 			return getStackStatus().getStackStatus();
 		}, () -> getStackStatus().toString());
 		statusPoller.waitUntilFinished();
@@ -117,44 +115,11 @@ public class CloudformationService {
 		LOG.info("Executing change set {}", changeSetArn);
 	}
 
-	private static class StatusPoller {
-		private final Supplier<String> statusSupplier;
-		private final Supplier<String> failureMessageSupplier;
+	public void deleteStack() {
+		cloudFormation.deleteStack(new DeleteStackRequest().withStackName(config.getStackName()));
+	}
 
-		public StatusPoller(Supplier<String> statusSupplier, Supplier<String> failureMessageSupplier) {
-			this.statusSupplier = statusSupplier;
-			this.failureMessageSupplier = failureMessageSupplier;
-		}
+	public void waitForStackDeleted() {
 
-		public void waitUntilFinished() {
-			final Instant start = Instant.now();
-			while (true) {
-				final String status = statusSupplier.get();
-				LOG.info("Got status {} after {}", status, Duration.between(start, Instant.now()));
-				if (isFailed(status)) {
-					throw new DeploymentException("Got failure status " + status + ": " + failureMessageSupplier.get());
-				}
-				if (isSuccess(status)) {
-					return;
-				}
-				sleep();
-			}
-		}
-
-		private void sleep() {
-			try {
-				Thread.sleep(2000);
-			} catch (final InterruptedException e) {
-				throw new DeploymentException("Exception while sleeping", e);
-			}
-		}
-
-		private boolean isSuccess(String status) {
-			return status.toUpperCase().endsWith("COMPLETE");
-		}
-
-		private boolean isFailed(String status) {
-			return status.toUpperCase().contains("FAILED") || status.equalsIgnoreCase("UPDATE_ROLLBACK_COMPLETE");
-		}
 	}
 }
