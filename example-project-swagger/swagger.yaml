@@ -8,7 +8,7 @@ schemes:
 - https
 paths:
   /hello:
-    x-amazon-apigateway-any-method:
+    get:
       produces:
       - application/json
       responses:
