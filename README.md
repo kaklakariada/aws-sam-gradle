@@ -8,7 +8,7 @@ Gradle plugin for deploying Serverless Java applications using AWS [Serverless A
   ```gradle
 plugins {
     id 'java'
-    id 'com.github.kaklakariada.aws-sam-deploy' version '0.0.3'
+    id 'com.github.kaklakariada.aws-sam-deploy' version '0.1.0'
 }
 ```
 2. Configure your AWS credentials in `~/.aws/`, see https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files
