@@ -30,14 +30,17 @@ public class CloudformationService {
 	private static final Logger LOG = Logging.getLogger(CloudformationService.class);
 	private final AmazonCloudFormation cloudFormation;
 	private final SamConfig config;
+	private final StatusPollingService pollingService;
 
-	public CloudformationService(SamConfig config, AmazonCloudFormation cloudFormation) {
+	public CloudformationService(SamConfig config, AmazonCloudFormation cloudFormation,
+			StatusPollingService pollingService) {
 		this.config = config;
 		this.cloudFormation = cloudFormation;
+		this.pollingService = pollingService;
 	}
 
 	public CloudformationService(SamConfig config) {
-		this(config, config.getAwsClientFactory().create(AmazonCloudFormationClient::new));
+		this(config, config.getAwsClientFactory().create(AmazonCloudFormationClient::new), new StatusPollingService());
 	}
 
 	public String createChangeSet(String changeSetName, ChangeSetType changeSetType, String templateBody,
@@ -81,9 +84,8 @@ public class CloudformationService {
 
 	public void waitForChangeSetReady(String changeSetArn) {
 		LOG.info("Waiting for change set {}", changeSetArn);
-		final StatusPoller statusPoller = StatusPoller.create(() -> getChangeSetStatus(changeSetArn).getStatus(),
+		pollingService.waitForStatus(() -> getChangeSetStatus(changeSetArn).getStatus(),
 				() -> getChangeSetStatus(changeSetArn).getStatusReason());
-		statusPoller.waitUntilFinished();
 	}
 
 	private DescribeChangeSetResult getChangeSetStatus(String changeSetArn) {
@@ -92,10 +94,9 @@ public class CloudformationService {
 
 	public void waitForStackReady() {
 		LOG.info("Waiting for stack {}", config.getStackName());
-		final StatusPoller statusPoller = StatusPoller.create(() -> {
+		pollingService.waitForStatus(() -> {
 			return getStackStatus().getStackStatus();
 		}, () -> getStackStatus().toString());
-		statusPoller.waitUntilFinished();
 	}
 
 	private Stack getStackStatus() {
