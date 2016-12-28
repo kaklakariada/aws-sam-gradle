@@ -9,9 +9,11 @@ import java.util.Objects;
 import org.gradle.api.logging.Logging;
 import org.slf4j.Logger;
 
+import com.amazonaws.services.cloudformation.AmazonCloudFormationClient;
 import com.amazonaws.services.cloudformation.model.ChangeSetType;
 import com.amazonaws.services.cloudformation.model.Parameter;
 import com.github.kaklakariada.aws.sam.config.SamConfig;
+import com.github.kaklakariada.aws.sam.service.poll.CloudFormationPollingService;
 
 public class DeployService {
 	private static final Logger LOG = Logging.getLogger(DeployService.class);
@@ -20,15 +22,23 @@ public class DeployService {
 	private final TemplateService templateService;
 	private final SamConfig config;
 
+	private final CloudFormationPollingService pollingService;
+
 	public DeployService(SamConfig config, CloudformationService cloudFormationService,
-			TemplateService templateService) {
+			CloudFormationPollingService pollingService, TemplateService templateService) {
 		this.config = config;
 		this.cloudFormationService = cloudFormationService;
+		this.pollingService = pollingService;
 		this.templateService = templateService;
 	}
 
+	public DeployService(SamConfig config, AmazonCloudFormationClient cloudFormation) {
+		this(config, new CloudformationService(config, cloudFormation),
+				new CloudFormationPollingService(cloudFormation), new TemplateService());
+	}
+
 	public DeployService(SamConfig config) {
-		this(config, new CloudformationService(config), new TemplateService());
+		this(config, config.getAwsClientFactory().create(AmazonCloudFormationClient::new));
 	}
 
 	public void deploy(String stackName, String templateBody, String codeUri, String swaggerDefinitionUri) {
@@ -38,9 +48,9 @@ public class DeployService {
 		final String newTemplateBody = updateTemplateBody(templateBody, codeUri, swaggerDefinitionUri);
 		final String changeSetArn = cloudFormationService.createChangeSet(changeSetName, changeSetType, newTemplateBody,
 				emptyList());
-		cloudFormationService.waitForChangeSetReady(changeSetArn);
+		pollingService.waitForChangeSetReady(changeSetArn);
 		cloudFormationService.executeChangeSet(changeSetArn);
-		cloudFormationService.waitForStackReady();
+		pollingService.waitForStackReady(stackName);
 		logStackOutput();
 	}
 

@@ -7,15 +7,12 @@ import org.gradle.api.logging.Logging;
 import org.slf4j.Logger;
 
 import com.amazonaws.services.cloudformation.AmazonCloudFormation;
-import com.amazonaws.services.cloudformation.AmazonCloudFormationClient;
 import com.amazonaws.services.cloudformation.model.AmazonCloudFormationException;
 import com.amazonaws.services.cloudformation.model.Capability;
 import com.amazonaws.services.cloudformation.model.ChangeSetType;
 import com.amazonaws.services.cloudformation.model.CreateChangeSetRequest;
 import com.amazonaws.services.cloudformation.model.CreateChangeSetResult;
 import com.amazonaws.services.cloudformation.model.DeleteStackRequest;
-import com.amazonaws.services.cloudformation.model.DescribeChangeSetRequest;
-import com.amazonaws.services.cloudformation.model.DescribeChangeSetResult;
 import com.amazonaws.services.cloudformation.model.DescribeStacksRequest;
 import com.amazonaws.services.cloudformation.model.DescribeStacksResult;
 import com.amazonaws.services.cloudformation.model.ExecuteChangeSetRequest;
@@ -30,17 +27,10 @@ public class CloudformationService {
 	private static final Logger LOG = Logging.getLogger(CloudformationService.class);
 	private final AmazonCloudFormation cloudFormation;
 	private final SamConfig config;
-	private final StatusPollingService pollingService;
 
-	public CloudformationService(SamConfig config, AmazonCloudFormation cloudFormation,
-			StatusPollingService pollingService) {
+	public CloudformationService(SamConfig config, AmazonCloudFormation cloudFormation) {
 		this.config = config;
 		this.cloudFormation = cloudFormation;
-		this.pollingService = pollingService;
-	}
-
-	public CloudformationService(SamConfig config) {
-		this(config, config.getAwsClientFactory().create(AmazonCloudFormationClient::new), new StatusPollingService());
 	}
 
 	public String createChangeSet(String changeSetName, ChangeSetType changeSetType, String templateBody,
@@ -82,29 +72,6 @@ public class CloudformationService {
 		return stack.getOutputs();
 	}
 
-	public void waitForChangeSetReady(String changeSetArn) {
-		LOG.info("Waiting for change set {}", changeSetArn);
-		pollingService.waitForStatus(() -> getChangeSetStatus(changeSetArn).getStatus(),
-				() -> getChangeSetStatus(changeSetArn).getStatusReason());
-	}
-
-	private DescribeChangeSetResult getChangeSetStatus(String changeSetArn) {
-		return cloudFormation.describeChangeSet(new DescribeChangeSetRequest().withChangeSetName(changeSetArn));
-	}
-
-	public void waitForStackReady() {
-		LOG.info("Waiting for stack {}", config.getStackName());
-		pollingService.waitForStatus(() -> {
-			return getStackStatus().getStackStatus();
-		}, () -> getStackStatus().toString());
-	}
-
-	private Stack getStackStatus() {
-		return describeStack().stream() //
-				.findFirst() //
-				.orElseThrow(() -> new DeploymentException("Stack '" + config.getStackName() + "' not found"));
-	}
-
 	private List<Stack> describeStack() {
 		final DescribeStacksResult result = cloudFormation
 				.describeStacks(new DescribeStacksRequest().withStackName(config.getStackName()));
@@ -121,6 +88,5 @@ public class CloudformationService {
 	}
 
 	public void waitForStackDeleted() {
-
 	}
 }
