@@ -7,7 +7,7 @@ Gradle plugin for deploying Serverless Java applications using AWS [Serverless A
 
 1. Add this plugin to your build script, see https://plugins.gradle.org/plugin/com.github.kaklakariada.aws-sam-deploy
 
-  ```gradle
+  ```groovy
 plugins {
     id 'java'
     id 'com.github.kaklakariada.aws-sam-deploy' version '0.1.1'
@@ -21,30 +21,30 @@ plugins {
   * `awsRegion`: AWS region in which to deploy your application, e.g. `eu-west-1`
 6. Add a `serverless` section to your build script and configure your stages:
 
-  ```gradle
+  ```groovy
 ext {
-    deployStage = project.hasProperty('stage') ? project.properties['stage'] : 'test'
+  deployStage = project.hasProperty('stage') ? project.properties['stage'] : 'test'
 }
 
 serverless {
-    currentStage = deployStage
-    defaultAwsProfile = 'default'
-    defaultAwsRegion = awsRegion
-    defaultDeploymentBucket = awsDeploymentBucket
-    stages {
-        test {
-            // use default values
-        }
-        prelive {
-            awsRegion = 'eu-west-1'
-            awsProfile = 'prelive-profile'
-            deploymentBucket = 'prelive-bucket'
-        }
+  currentStage = deployStage
+  defaultAwsProfile = 'default'
+  defaultAwsRegion = awsRegion
+  defaultDeploymentBucket = awsDeploymentBucket
+  stages {
+    test {
+      // use default values
     }
-    api {
-        stackName = "${project.name}-${deployStage}"
-        samTemplate = file('template.yml')
+    prelive {
+      awsRegion = 'eu-west-1'
+      awsProfile = 'prelive-profile'
+      deploymentBucket = 'prelive-bucket'
     }
+  }
+  api {
+    stackName = "${project.name}-${deployStage}"
+    samTemplate = file('template.yml')
+  }
 }
 ```
 
@@ -52,7 +52,14 @@ serverless {
 
 Deploy your app with `./gradlew -Pstage=<myStage> deploy -i`.
 
-#### Delete stack
+The plugin will
+* Build a zip of your application including dependencies
+* Upload the the zip the configured S3 bucket
+* Replace some placeholders in your swagger definition and upload it to S3
+* Replace some placeholders in your cloudformation template and create a change set
+* Execute the change set to create the stack and deploy your application
+
+### Delete stack
 
 Deploy your app with `./gradlew -Pstage=<myStage> deleteStack -i`.
 
