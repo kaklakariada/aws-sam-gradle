@@ -1,8 +1,10 @@
 package com.github.kaklakariada.aws.sam.service.poll;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.amazonaws.services.cloudformation.AmazonCloudFormation;
+import com.amazonaws.services.cloudformation.model.AmazonCloudFormationException;
 import com.amazonaws.services.cloudformation.model.DescribeStacksRequest;
 import com.amazonaws.services.cloudformation.model.Stack;
 import com.github.kaklakariada.aws.sam.DeploymentException;
@@ -19,7 +21,7 @@ abstract class StackStatusWaitCondition implements WaitCondition {
 
 	@Override
 	public String getStatus() {
-		return getStack().getStackStatus();
+		return getStack().get().getStackStatus();
 	}
 
 	@Override
@@ -27,16 +29,23 @@ abstract class StackStatusWaitCondition implements WaitCondition {
 		return getStack().toString();
 	}
 
-	private Stack getStack() {
-		final List<Stack> stacks = cloudFormation.describeStacks(new DescribeStacksRequest().withStackName(stackName))
-				.getStacks();
+	protected Optional<Stack> getStack() {
+		final List<Stack> stacks;
+		try {
+			stacks = cloudFormation.describeStacks(new DescribeStacksRequest().withStackName(stackName)).getStacks();
+		} catch (final AmazonCloudFormationException e) {
+			if (e.getStatusCode() == 400) {
+				return Optional.empty();
+			}
+			throw e;
+		}
 		if (stacks.isEmpty()) {
-			throw new DeploymentException("Stack '" + stackName + "' not found");
+			return Optional.empty();
 		}
 		if (stacks.size() > 1) {
 			throw new DeploymentException("Found more than one stack for name '" + stackName + "'");
 		}
 		final Stack stack = stacks.get(0);
-		return stack;
+		return Optional.of(stack);
 	}
 }
