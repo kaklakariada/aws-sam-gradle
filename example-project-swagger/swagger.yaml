@@ -2,12 +2,13 @@
 swagger: 2.0
 basePath: /${stage}
 info:
-  title: My AWS SAM test app
+  title: Minimal serverless app with swagger definition
+  version: 1.0
 schemes:
 - https
 paths:
   /hello:
-    get:
+    x-amazon-apigateway-any-method:
       produces:
       - application/json
       responses:

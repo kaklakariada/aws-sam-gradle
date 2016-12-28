@@ -47,7 +47,7 @@ public class PluginTest {
 		final String apiUrl = getStackOutput("ApiUrl");
 
 		final String serviceResult = getWebServiceResult(apiUrl + "/hello");
-		assertEquals("blubb", serviceResult);
+		assertEquals("Hello world!", serviceResult);
 	}
 
 	private String getWebServiceResult(final String url) throws IOException, ClientProtocolException {

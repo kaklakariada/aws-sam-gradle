@@ -25,7 +25,7 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Path: /hello
             Method: ANY
-
+            
 Outputs:
   ApiUrl:
     Description: API endpoint URL
