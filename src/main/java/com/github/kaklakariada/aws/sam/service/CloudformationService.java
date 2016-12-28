@@ -154,7 +154,7 @@ public class CloudformationService {
 		}
 
 		private boolean isFailed(String status) {
-			return status.toUpperCase().contains("FAILED");
+			return status.toUpperCase().contains("FAILED") || status.equalsIgnoreCase("UPDATE_ROLLBACK_COMPLETE");
 		}
 	}
 }
