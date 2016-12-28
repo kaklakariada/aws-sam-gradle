@@ -35,14 +35,14 @@ public class PluginTest {
 	@Test
 	public void testDeployMinimalApp() {
 		runBuild(MINIMAL_PROJECT_DIR, //
-				"-Pstage" + STAGE, "deploy", "--info", "--stacktrace");
+				"-Pstage" + STAGE, "clean", "deploy", "--info", "--stacktrace");
 		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
 	}
 
 	@Test
 	public void testDeploySwaggerApp() throws ClientProtocolException, IOException {
 		runBuild(SWAGGER_PROJECT_DIR, //
-				"-Pstage" + STAGE, "deploy", "--info", "--stacktrace");
+				"-Pstage" + STAGE, "clean", "deploy", "--info", "--stacktrace");
 		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
 		final String apiUrl = getStackOutput("ApiUrl");
 
@@ -66,7 +66,7 @@ public class PluginTest {
 	}
 
 	private String getStackOutput(String outputParamName) {
-		final Pattern pattern = Pattern.compile("(?m)^Stack output " + outputParamName + " = (.*)$");
+		final Pattern pattern = Pattern.compile("(?ms).*^Stack output " + outputParamName + " = ([^\n\r]*)$.*");
 		final Matcher matcher = pattern.matcher(buildResult.getOutput());
 		assertTrue("Pattern '" + pattern + "' does not match output", matcher.matches());
 		final String outputValue = matcher.group(1);
