@@ -29,11 +29,4 @@ Resources:
 Outputs:
   ApiUrl:
     Description: API endpoint URL
-    Value: !Join
-      - ''
-      - - https://
-        - !Ref ApiGatewayApi
-        - '.execute-api.'
-        - !Ref 'AWS::Region'
-        - '.amazonaws.com/'
-        - '${stage}'
+    Value: !Sub https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/${stage}
