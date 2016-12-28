@@ -33,29 +33,35 @@ public class DeployService {
 	}
 
 	public DeployService(SamConfig config, AmazonCloudFormationClient cloudFormation) {
-		this(config, new CloudformationService(config, cloudFormation),
-				new CloudFormationPollingService(cloudFormation), new TemplateService());
+		this(config, new CloudformationService(cloudFormation), new CloudFormationPollingService(cloudFormation),
+				new TemplateService());
 	}
 
 	public DeployService(SamConfig config) {
 		this(config, config.getAwsClientFactory().create(AmazonCloudFormationClient::new));
 	}
 
-	public void deploy(String stackName, String templateBody, String codeUri, String swaggerDefinitionUri) {
+	public void deploy(String templateBody, String codeUri, String swaggerDefinitionUri) {
+		final String stackName = config.getStackName();
 		final String changeSetName = stackName + "-" + System.currentTimeMillis();
-		final ChangeSetType changeSetType = cloudFormationService.stackExists() ? ChangeSetType.UPDATE
+		final ChangeSetType changeSetType = cloudFormationService.stackExists(stackName) ? ChangeSetType.UPDATE
 				: ChangeSetType.CREATE;
 		final String newTemplateBody = updateTemplateBody(templateBody, codeUri, swaggerDefinitionUri);
-		final String changeSetArn = cloudFormationService.createChangeSet(changeSetName, changeSetType, newTemplateBody,
-				emptyList());
+		final String changeSetArn = cloudFormationService.createChangeSet(changeSetName, stackName, changeSetType,
+				newTemplateBody, emptyList());
 		pollingService.waitForChangeSetReady(changeSetArn);
 		cloudFormationService.executeChangeSet(changeSetArn);
 		pollingService.waitForStackReady(stackName);
 		logStackOutput();
 	}
 
+	public void deleteStack(String stackName) {
+		cloudFormationService.deleteStack(stackName);
+		pollingService.waitForStackDeleted(stackName);
+	}
+
 	private void logStackOutput() {
-		cloudFormationService.getOutputParameters()
+		cloudFormationService.getOutputParameters(config.getStackName())
 				.forEach(output -> LOG.info("Stack output {} = {}", output.getOutputKey(), output.getOutputValue()));
 	}
 

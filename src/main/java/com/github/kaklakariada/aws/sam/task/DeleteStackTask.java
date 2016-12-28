@@ -8,21 +8,15 @@ import org.gradle.api.tasks.TaskAction;
 
 import com.github.kaklakariada.aws.sam.config.SamConfig;
 import com.github.kaklakariada.aws.sam.service.DeployService;
-import com.github.kaklakariada.aws.sam.service.TemplateService;
 
-public class DeployTask extends DefaultTask {
+public class DeleteStackTask extends DefaultTask {
 
-	@Input
-	public String codeUri;
-	@Input
-	public String swaggerUri;
 	@Input
 	public SamConfig config;
 
 	@TaskAction
 	public void uploadFileToS3() throws IOException, InterruptedException {
-		final String templateBody = new TemplateService().loadFile(config.api.samTemplate.toPath());
 		final DeployService deployService = new DeployService(config);
-		deployService.deploy(templateBody, codeUri, swaggerUri);
+		deployService.deleteStack(config.getStackName());
 	}
 }

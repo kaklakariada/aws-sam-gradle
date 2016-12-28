@@ -40,6 +40,16 @@ public class PluginTest {
 	}
 
 	@Test
+	public void testDeleteStack() {
+		runBuild(MINIMAL_PROJECT_DIR, //
+				"-Pstage" + STAGE, "clean", "deploy", "--info", "--stacktrace");
+		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
+		runBuild(MINIMAL_PROJECT_DIR, //
+				"-Pstage" + STAGE, "deleteStack", "--info", "--stacktrace");
+		assertEquals(buildResult.task(":deleteStack").getOutcome(), TaskOutcome.SUCCESS);
+	}
+
+	@Test
 	public void testDeploySwaggerApp() throws ClientProtocolException, IOException {
 		runBuild(SWAGGER_PROJECT_DIR, //
 				"-Pstage" + STAGE, "clean", "deploy", "--info", "--stacktrace");

@@ -20,27 +20,24 @@ import com.amazonaws.services.cloudformation.model.Output;
 import com.amazonaws.services.cloudformation.model.Parameter;
 import com.amazonaws.services.cloudformation.model.Stack;
 import com.github.kaklakariada.aws.sam.DeploymentException;
-import com.github.kaklakariada.aws.sam.config.SamConfig;
 
 public class CloudformationService {
 
 	private static final Logger LOG = Logging.getLogger(CloudformationService.class);
 	private final AmazonCloudFormation cloudFormation;
-	private final SamConfig config;
 
-	public CloudformationService(SamConfig config, AmazonCloudFormation cloudFormation) {
-		this.config = config;
+	public CloudformationService(AmazonCloudFormation cloudFormation) {
 		this.cloudFormation = cloudFormation;
 	}
 
-	public String createChangeSet(String changeSetName, ChangeSetType changeSetType, String templateBody,
-			Collection<Parameter> parameters) {
-		LOG.info("Creating change set for stack {} with name {}, type {} and parameters {}", config.getStackName(),
-				changeSetName, changeSetType, parameters);
+	public String createChangeSet(String changeSetName, String stackName, ChangeSetType changeSetType,
+			String templateBody, Collection<Parameter> parameters) {
+		LOG.info("Creating change set for stack {} with name {}, type {} and parameters {}", stackName, changeSetName,
+				changeSetType, parameters);
 		final CreateChangeSetRequest changeSetRequest = new CreateChangeSetRequest() //
 				.withCapabilities(Capability.CAPABILITY_IAM) //
-				.withStackName(config.getStackName()) //
-				.withDescription(config.getStackName()) //
+				.withStackName(stackName) //
+				.withDescription(stackName) //
 				.withChangeSetName(changeSetName) //
 				.withChangeSetType(changeSetType) //
 				.withParameters(parameters).withTemplateBody(templateBody);
@@ -49,11 +46,11 @@ public class CloudformationService {
 		return result.getId();
 	}
 
-	public boolean stackExists() {
+	public boolean stackExists(String stackName) {
 		try {
-			return describeStack().stream() //
+			return describeStack(stackName).stream() //
 					.peek(s -> LOG.info("Found stack {}", s)) //
-					.filter(s -> s.getStackName().equals(config.getStackName())) //
+					.filter(s -> s.getStackName().equals(stackName)) //
 					.filter(s -> !s.getStackStatus().equals("REVIEW_IN_PROGRESS")) //
 					.findAny() //
 					.isPresent();
@@ -66,15 +63,15 @@ public class CloudformationService {
 		}
 	}
 
-	public List<Output> getOutputParameters() {
-		final Stack stack = describeStack().stream().findFirst()
+	public List<Output> getOutputParameters(String stackName) {
+		final Stack stack = describeStack(stackName).stream().findFirst()
 				.orElseThrow(() -> new DeploymentException("Stack not found"));
 		return stack.getOutputs();
 	}
 
-	private List<Stack> describeStack() {
+	private List<Stack> describeStack(String stackName) {
 		final DescribeStacksResult result = cloudFormation
-				.describeStacks(new DescribeStacksRequest().withStackName(config.getStackName()));
+				.describeStacks(new DescribeStacksRequest().withStackName(stackName));
 		return result.getStacks();
 	}
 
@@ -83,10 +80,8 @@ public class CloudformationService {
 		LOG.info("Executing change set {}", changeSetArn);
 	}
 
-	public void deleteStack() {
-		cloudFormation.deleteStack(new DeleteStackRequest().withStackName(config.getStackName()));
-	}
-
-	public void waitForStackDeleted() {
+	public void deleteStack(String stackName) {
+		LOG.info("Delete stack '{}'", stackName);
+		cloudFormation.deleteStack(new DeleteStackRequest().withStackName(stackName));
 	}
 }

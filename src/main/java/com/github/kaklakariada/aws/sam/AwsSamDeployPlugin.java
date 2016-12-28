@@ -20,6 +20,7 @@ import com.amazonaws.services.cloudformation.model.Parameter;
 import com.github.kaklakariada.aws.sam.config.SamConfig;
 import com.github.kaklakariada.aws.sam.config.Stage;
 import com.github.kaklakariada.aws.sam.service.AwsMetadataService;
+import com.github.kaklakariada.aws.sam.task.DeleteStackTask;
 import com.github.kaklakariada.aws.sam.task.DeployTask;
 import com.github.kaklakariada.aws.sam.task.ReplacePlaceholerTask;
 import com.github.kaklakariada.aws.sam.task.S3UploadTask;
@@ -58,6 +59,7 @@ public class AwsSamDeployPlugin implements Plugin<Project> {
 			uploadSwaggerTask = createUploadSwaggerTask(updateSwaggerTask);
 		}
 		createDeployTask(uploadZipTask, uploadSwaggerTask);
+		createDeleteStackTask();
 	}
 
 	private DeployTask createDeployTask(S3UploadTask uploadZipTask, S3UploadTask uploadSwaggerTask) {
@@ -119,6 +121,13 @@ public class AwsSamDeployPlugin implements Plugin<Project> {
 					project.getTasks().getByPath(":processResources"));
 		}));
 		return task;
+	}
+
+	private void createDeleteStackTask() {
+		final DeleteStackTask task = createTask("deleteStack", DeleteStackTask.class);
+		task.setDescription("Delete cloudformation stack");
+		task.setGroup(TASK_GROUP);
+		task.config = config;
 	}
 
 	private <T extends DefaultTask> T createTask(String taskName, Class<T> taskType) {
