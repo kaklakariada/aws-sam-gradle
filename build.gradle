@@ -1,6 +1,7 @@
 plugins {
     id 'java-gradle-plugin'
-    id "com.gradle.plugin-publish" version "0.9.7"
+    id 'com.gradle.plugin-publish' version '0.9.7'
+    id 'com.github.hierynomus.license' version '0.13.1'
 }
 
 repositories {
@@ -51,4 +52,11 @@ test {
     testLogging {
         showStandardStreams = true
     }
+}
+
+license {
+    header = file('gradle/license-header.txt')
+    ext.year = 2017
+    ext.name = 'Christoph Pirkl'
+    ext.email = 'christoph at users.sourceforge.net'
 }
