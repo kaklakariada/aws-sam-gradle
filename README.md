@@ -1,5 +1,5 @@
 # aws-sam-gradle
-Gradle plugin for deploying Serverless Java applications using AWS [Serverless Application Models (SAM)](https://github.com/awslabs/serverless-application-model) via CloudFormation.
+Gradle plugin for deploying Serverless Java applications using AWS [Serverless Application Models (SAM)](https://github.com/awslabs/serverless-application-model) via CloudFormation templates.
 
 ## Usage
 
@@ -9,8 +9,8 @@ Gradle plugin for deploying Serverless Java applications using AWS [Serverless A
 
   ```groovy
 plugins {
-    id 'java'
-    id 'com.github.kaklakariada.aws-sam-deploy' version '0.1.1'
+	id 'java'
+	id 'com.github.kaklakariada.aws-sam-deploy' version '0.1.1'
 }
 ```
 2. Configure your AWS credentials in `~/.aws/`, see https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-started.html#cli-config-files
@@ -23,28 +23,28 @@ plugins {
 
   ```groovy
 ext {
-  deployStage = project.hasProperty('stage') ? project.properties['stage'] : 'test'
+	deployStage = project.hasProperty('stage') ? project.properties['stage'] : 'test'
 }
 
 serverless {
-  currentStage = deployStage
-  defaultAwsProfile = 'default'
-  defaultAwsRegion = awsRegion
-  defaultDeploymentBucket = awsDeploymentBucket
-  stages {
-    test {
-      // use default values
-    }
-    prelive {
-      awsRegion = 'eu-west-1'
-      awsProfile = 'prelive-profile'
-      deploymentBucket = 'prelive-bucket'
-    }
-  }
-  api {
-    stackName = "${project.name}-${deployStage}"
-    samTemplate = file('template.yml')
-  }
+	currentStage = deployStage
+	defaultAwsProfile = 'default'
+	defaultAwsRegion = awsRegion
+	defaultDeploymentBucket = awsDeploymentBucket
+	stages {
+		test {
+			// use default values
+		}
+		prelive {
+			awsRegion = 'eu-west-1'
+			awsProfile = 'prelive-profile'
+			deploymentBucket = 'prelive-bucket'
+		}
+	}
+	api {
+		stackName = "${project.name}-${deployStage}"
+		samTemplate = file('template.yml')
+	}
 }
 ```
 
@@ -52,17 +52,19 @@ serverless {
 
 Deploy your app with `./gradlew -Pstage=<myStage> deploy -i`.
 
-The plugin will
+This will
 * Build a zip of your application including dependencies
-* Upload the the zip the configured S3 bucket
+* Upload the zip to the configured S3 bucket
 * Replace some placeholders in your swagger definition and upload it to S3
-* Replace some placeholders in your cloudformation template and create a change set
-* Execute the change set to create the stack and deploy your application
+* Replace some placeholders in your CloudFormation template and create a change set
+* Execute the change set to create/update the CloudFormation stack
 
 ### Delete stack
 
-Deploy your app with `./gradlew -Pstage=<myStage> deleteStack -i`.
+Delete your complete stack with `./gradlew -Pstage=<myStage> deleteStack -i`.
+
+Be careful, this will may also delete DynamoDB tables.
 
 ## Example projects
 * [example-project-minimal](https://github.com/kaklakariada/aws-sam-gradle/tree/master/example-project-minimal): minimal project
-* [example-project-minimal](https://github.com/kaklakariada/aws-sam-gradle/tree/master/example-project-swagger): minimal project with swagger definition
+* [example-project-swagger](https://github.com/kaklakariada/aws-sam-gradle/tree/master/example-project-swagger): minimal project with swagger definition
