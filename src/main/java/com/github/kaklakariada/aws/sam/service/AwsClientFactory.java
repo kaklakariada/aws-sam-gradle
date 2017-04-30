@@ -17,12 +17,9 @@
  */
 package com.github.kaklakariada.aws.sam.service;
 
-import java.util.function.Function;
-
-import com.amazonaws.AmazonWebServiceClient;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.regions.Region;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 
 public class AwsClientFactory {
@@ -39,9 +36,10 @@ public class AwsClientFactory {
 		return new AwsClientFactory(region, credentialsProvider);
 	}
 
-	public <T extends AmazonWebServiceClient> T create(Function<AWSCredentialsProvider, T> factory) {
-		final T client = factory.apply(credentialsProvider);
-		client.setRegion(Region.getRegion(region));
-		return client;
+	public <T, B extends AwsClientBuilder<B, T>> T create(final AwsClientBuilder<B, T> builder) {
+		return builder //
+				.withCredentials(credentialsProvider) //
+				.withRegion(region) //
+				.build();
 	}
 }

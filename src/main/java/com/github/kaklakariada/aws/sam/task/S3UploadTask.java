@@ -30,6 +30,7 @@ import org.gradle.api.tasks.TaskAction;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
 import com.github.kaklakariada.aws.sam.config.SamConfig;
 
@@ -43,7 +44,7 @@ public class S3UploadTask extends DefaultTask {
 
 	@TaskAction
 	public void uploadFileToS3() {
-		final AmazonS3 s3Client = new AmazonS3Client().withRegion(config.getRegion());
+		final AmazonS3 s3Client = AmazonS3Client.builder().withRegion(config.getRegion()).build();
 		upload(s3Client, calculateS3Key());
 	}
 
@@ -66,7 +67,7 @@ public class S3UploadTask extends DefaultTask {
 	private void transferFileToS3(final AmazonS3 s3Client, final String key) {
 		final long fileSizeMb = file.length() / (1024 * 1024);
 		getLogger().info("Uploading {} MB from file {} to {}", fileSizeMb, file, getS3Url());
-		final TransferManager transferManager = new TransferManager(s3Client);
+		final TransferManager transferManager = TransferManagerBuilder.standard().withS3Client(s3Client).build();
 		final Instant start = Instant.now();
 		final Upload upload = transferManager.upload(config.getDeploymentBucket(), key, file);
 		try {

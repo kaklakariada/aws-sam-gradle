@@ -26,7 +26,8 @@ import java.util.Objects;
 import org.gradle.api.logging.Logging;
 import org.slf4j.Logger;
 
-import com.amazonaws.services.cloudformation.AmazonCloudFormationClient;
+import com.amazonaws.services.cloudformation.AmazonCloudFormation;
+import com.amazonaws.services.cloudformation.AmazonCloudFormationClientBuilder;
 import com.amazonaws.services.cloudformation.model.ChangeSetType;
 import com.amazonaws.services.cloudformation.model.Parameter;
 import com.github.kaklakariada.aws.sam.config.SamConfig;
@@ -49,13 +50,13 @@ public class DeployService {
 		this.templateService = templateService;
 	}
 
-	public DeployService(SamConfig config, AmazonCloudFormationClient cloudFormation) {
+	public DeployService(SamConfig config, AmazonCloudFormation cloudFormation) {
 		this(config, new CloudformationService(cloudFormation), new CloudFormationPollingService(cloudFormation),
 				new TemplateService());
 	}
 
 	public DeployService(SamConfig config) {
-		this(config, config.getAwsClientFactory().create(AmazonCloudFormationClient::new));
+		this(config, config.getAwsClientFactory().create(AmazonCloudFormationClientBuilder.standard()));
 	}
 
 	public void deploy(String templateBody, String codeUri, String swaggerDefinitionUri) {

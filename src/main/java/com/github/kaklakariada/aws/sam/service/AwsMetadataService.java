@@ -18,7 +18,7 @@
 package com.github.kaklakariada.aws.sam.service;
 
 import com.amazonaws.services.securitytoken.AWSSecurityTokenService;
-import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceAsyncClient;
+import com.amazonaws.services.securitytoken.AWSSecurityTokenServiceAsyncClientBuilder;
 import com.amazonaws.services.securitytoken.model.GetCallerIdentityRequest;
 import com.amazonaws.services.securitytoken.model.GetCallerIdentityResult;
 import com.github.kaklakariada.aws.sam.config.SamConfig;
@@ -32,7 +32,7 @@ public class AwsMetadataService {
 	}
 
 	public AwsMetadataService(SamConfig config) {
-		this(config.getAwsClientFactory().create(AWSSecurityTokenServiceAsyncClient::new));
+		this(config.getAwsClientFactory().create(AWSSecurityTokenServiceAsyncClientBuilder.standard()));
 	}
 
 	public String getAccountId() {
