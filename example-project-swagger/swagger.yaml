@@ -2,7 +2,9 @@
 swagger: 2.0
 basePath: /${stage}
 info:
-  title: Minimal serverless app with swagger definition
+  title: Minimal app with swagger
+  description: |
+    Minimal serverless application with inline swagger definition for testing deployment
   version: 1.0
 schemes:
 - https

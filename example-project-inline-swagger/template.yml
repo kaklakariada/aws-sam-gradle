@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: Minimal serverless application with swagger definition for testing deployment
+Description: Minimal serverless application with inline swagger definition for testing deployment
 
 Resources:
   ApiGatewayApi:
@@ -14,6 +14,8 @@ Resources:
         info:
           title:
             Ref: AWS::StackName
+          description: |
+            Minimal serverless application with inline swagger definition for testing deployment
         paths:
           "/hello":
             get:
