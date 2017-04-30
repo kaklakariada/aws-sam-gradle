@@ -83,7 +83,7 @@ Import into eclipse using [buildship](https://projects.eclipse.org/projects/tool
 ### Generate license header for added files:
 
 ```bash
-$ ./gradlew licenseFormatMain licenseFormatTest
+$ ./gradlew licenseFormat
 ```
 ### Publish to [plugins.gradle.org](https://plugins.gradle.org)
 
