@@ -12,7 +12,7 @@ version = '0.1.1'
 group = 'com.github.kaklakariada.aws'
 
 ext {
-  awsApiVersion = '1.11.69'
+  awsApiVersion = '1.11.125'
   gradlePluginId = 'com.github.kaklakariada.aws-sam-deploy'
 }
 
