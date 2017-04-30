@@ -67,4 +67,5 @@ Be careful, this will may also delete DynamoDB tables.
 
 ## Example projects
 * [example-project-minimal](https://github.com/kaklakariada/aws-sam-gradle/tree/master/example-project-minimal): minimal project
-* [example-project-swagger](https://github.com/kaklakariada/aws-sam-gradle/tree/master/example-project-swagger): minimal project with swagger definition
+* [example-project-swagger](https://github.com/kaklakariada/aws-sam-gradle/tree/master/example-project-swagger): minimal project with swagger definition in separate file
+* [example-project-inline-swagger](https://github.com/kaklakariada/aws-sam-gradle/tree/master/example-project-inline-swagger): minimal project with inline swagger definition in CloudFormation template
