@@ -69,3 +69,30 @@ Be careful, this will may also delete DynamoDB tables.
 * [example-project-minimal](https://github.com/kaklakariada/aws-sam-gradle/tree/master/example-project-minimal): minimal project
 * [example-project-swagger](https://github.com/kaklakariada/aws-sam-gradle/tree/master/example-project-swagger): minimal project with swagger definition in separate file
 * [example-project-inline-swagger](https://github.com/kaklakariada/aws-sam-gradle/tree/master/example-project-inline-swagger): minimal project with inline swagger definition in CloudFormation template
+
+## Development
+
+```bash
+$ git clone https://github.com/kaklakariada/aws-sam-gradle.git
+```
+
+### Using eclipse
+
+Import into eclipse using [buildship](https://projects.eclipse.org/projects/tools.buildship).
+
+### Generate license header for added files:
+
+```bash
+$ ./gradlew licenseFormatMain licenseFormatTest
+```
+### Publish to [plugins.gradle.org](https://plugins.gradle.org)
+
+See https://plugins.gradle.org/docs/submit for details.
+
+1. Add API Key from https://plugins.gradle.org to `~/.gradle/gradle.properties`:
+
+    ```
+    gradle.publish.key = ...
+    gradle.publish.secret = ...
+    ```
+2. Run `./gradlew publishPlugins`
