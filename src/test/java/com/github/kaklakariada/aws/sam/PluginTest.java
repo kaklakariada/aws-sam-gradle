@@ -75,10 +75,7 @@ public class PluginTest {
 		runBuild(SWAGGER_PROJECT_DIR, //
 				"clean", "deploy");
 		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
-		final String apiUrl = getStackOutput("ApiUrl");
-
-		final String serviceResult = getWebServiceResult(apiUrl + "/hello");
-		assertEquals("Hello world!", serviceResult);
+		assertApiGatewayDeployed();
 	}
 
 	@Test
@@ -86,8 +83,11 @@ public class PluginTest {
 		runBuild(INLINE_SWAGGER_PROJECT_DIR, //
 				"clean", "deploy");
 		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
-		final String apiUrl = getStackOutput("ApiUrl");
+		assertApiGatewayDeployed();
+	}
 
+	private void assertApiGatewayDeployed() throws IOException, ClientProtocolException {
+		final String apiUrl = getStackOutput("ApiUrl");
 		final String serviceResult = getWebServiceResult(apiUrl + "/hello");
 		assertEquals("Hello world!", serviceResult);
 	}
