@@ -17,17 +17,18 @@ Resources:
           description: |
             Minimal serverless application with inline swagger definition for testing deployment
         paths:
-          "/hello":
+          /hello:
             get:
+              description: Returns 'Hello world!'
+              responses:
+                default:
+                  statusCode: 200
               x-amazon-apigateway-integration:
                 passthroughBehavior: when_no_match
                 httpMethod: POST
                 type: aws_proxy
                 uri:
                   Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetFunction.Arn}/invocations
-              responses:
-                default:
-                  statusCode: 200
 
   GetFunction:
     Type: AWS::Serverless::Function

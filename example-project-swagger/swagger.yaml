@@ -11,6 +11,7 @@ schemes:
 paths:
   /hello:
     get:
+      description: Returns 'Hello world!'
       produces:
       - application/json
       responses:
