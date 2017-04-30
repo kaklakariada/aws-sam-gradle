@@ -19,7 +19,7 @@ serverless {
     defaultAwsRegion = awsRegion
     defaultDeploymentBucket = awsDeploymentBucket
     stages {
-        test {
+        stest {
             // use default values
         }
         prelive {

@@ -17,6 +17,7 @@
  */
 package com.github.kaklakariada.aws.sam;
 
+import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -25,6 +26,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -44,7 +47,7 @@ import org.slf4j.Logger;
 public class PluginTest {
 	private static final Logger LOG = Logging.getLogger(PluginTest.class);
 
-	private static final String STAGE = "test";
+	private static final String STAGE = "stest";
 	private static final File MINIMAL_PROJECT_DIR = new File("example-project-minimal");
 	private static final File SWAGGER_PROJECT_DIR = new File("example-project-swagger");
 	private static final File INLINE_SWAGGER_PROJECT_DIR = new File("example-project-inline-swagger");
@@ -53,24 +56,24 @@ public class PluginTest {
 	@Test
 	public void testDeployMinimalApp() {
 		runBuild(MINIMAL_PROJECT_DIR, //
-				"-Pstage" + STAGE, "clean", "deploy", "--info", "--stacktrace");
+				"clean", "deploy");
 		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
 	}
 
 	@Test
 	public void testDeleteStack() {
 		runBuild(MINIMAL_PROJECT_DIR, //
-				"-Pstage" + STAGE, "clean", "deploy");
+				"clean", "deploy");
 		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
 		runBuild(MINIMAL_PROJECT_DIR, //
-				"-Pstage" + STAGE, "deleteStack");
+				"deleteStack");
 		assertEquals(buildResult.task(":deleteStack").getOutcome(), TaskOutcome.SUCCESS);
 	}
 
 	@Test
 	public void testDeploySwaggerApp() throws ClientProtocolException, IOException {
 		runBuild(SWAGGER_PROJECT_DIR, //
-				"-Pstage" + STAGE, "clean", "deploy", "--info", "--stacktrace");
+				"clean", "deploy");
 		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
 		final String apiUrl = getStackOutput("ApiUrl");
 
@@ -81,7 +84,7 @@ public class PluginTest {
 	@Test
 	public void testDeployInlineSwaggerApp() throws ClientProtocolException, IOException {
 		runBuild(INLINE_SWAGGER_PROJECT_DIR, //
-				"-Pstage" + STAGE, "clean", "deploy", "--info", "--stacktrace");
+				"clean", "deploy");
 		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
 		final String apiUrl = getStackOutput("ApiUrl");
 
@@ -114,9 +117,12 @@ public class PluginTest {
 	}
 
 	private void runBuild(File projectDir, String... arguments) {
+		final List<String> argsList = new ArrayList<>();
+		argsList.addAll(asList(arguments));
+		argsList.addAll(asList("-Pstage=" + STAGE, "--info", "--stacktrace", "--max-workers", "1"));
 		buildResult = GradleRunner.create().withProjectDir(projectDir.getAbsoluteFile()) //
 				.withPluginClasspath() //
-				.withArguments(arguments) //
+				.withArguments(argsList) //
 				.forwardOutput() //
 				.build();
 	}
