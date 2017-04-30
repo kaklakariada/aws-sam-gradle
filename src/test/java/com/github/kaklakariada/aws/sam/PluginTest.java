@@ -47,6 +47,7 @@ public class PluginTest {
 	private static final String STAGE = "test";
 	private static final File MINIMAL_PROJECT_DIR = new File("example-project-minimal");
 	private static final File SWAGGER_PROJECT_DIR = new File("example-project-swagger");
+	private static final File INLINE_SWAGGER_PROJECT_DIR = new File("example-project-inline-swagger");
 	private BuildResult buildResult;
 
 	@Test
@@ -59,16 +60,27 @@ public class PluginTest {
 	@Test
 	public void testDeleteStack() {
 		runBuild(MINIMAL_PROJECT_DIR, //
-				"-Pstage" + STAGE, "clean", "deploy", "--info", "--stacktrace");
+				"-Pstage" + STAGE, "clean", "deploy");
 		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
 		runBuild(MINIMAL_PROJECT_DIR, //
-				"-Pstage" + STAGE, "deleteStack", "--info", "--stacktrace");
+				"-Pstage" + STAGE, "deleteStack");
 		assertEquals(buildResult.task(":deleteStack").getOutcome(), TaskOutcome.SUCCESS);
 	}
 
 	@Test
 	public void testDeploySwaggerApp() throws ClientProtocolException, IOException {
 		runBuild(SWAGGER_PROJECT_DIR, //
+				"-Pstage" + STAGE, "clean", "deploy", "--info", "--stacktrace");
+		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
+		final String apiUrl = getStackOutput("ApiUrl");
+
+		final String serviceResult = getWebServiceResult(apiUrl + "/hello");
+		assertEquals("Hello world!", serviceResult);
+	}
+
+	@Test
+	public void testDeployInlineSwaggerApp() throws ClientProtocolException, IOException {
+		runBuild(INLINE_SWAGGER_PROJECT_DIR, //
 				"-Pstage" + STAGE, "clean", "deploy", "--info", "--stacktrace");
 		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
 		final String apiUrl = getStackOutput("ApiUrl");
