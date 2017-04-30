@@ -17,8 +17,8 @@ plugins {
 3. Create a SAM cloud formation template, see https://github.com/awslabs/serverless-application-model
 4. Optionally: create a swagger interface definition, see http://swagger.io/specification/
 5. Create file `gradle.properties` in your project dir with the following entries:
-  * `awsDeploymentBucket`: Bucket used for uploading lambda code and swagger definition, e.g. `my-deployment-bucket`
-  * `awsRegion`: AWS region in which to deploy your application, e.g. `eu-west-1`
+   * `awsDeploymentBucket`: Bucket used for uploading lambda code and swagger definition, e.g. `my-deployment-bucket`
+   * `awsRegion`: AWS region in which to deploy your application, e.g. `eu-west-1`
 6. Add a `serverless` section to your build script and configure your stages:
 
   ```groovy
