@@ -1,0 +1,46 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Minimal serverless application with swagger definition for testing deployment
+
+Resources:
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: ${stage}
+      Variables:
+        GetLambdaFunctionName: !Ref GetFunction
+        stage: ${stage}
+      DefinitionBody:
+            swagger: 2.0
+            info:
+              title:
+                Ref: AWS::StackName
+            paths:
+              "/get":
+                get:
+                  x-amazon-apigateway-integration:
+                    httpMethod: POST
+                    type: aws_proxy
+                    uri:
+                      Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetFunction.Arn}/invocations
+                  responses: {}
+            swagger: '2.0'
+
+  GetFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: hello.HelloHandler
+      Runtime: java8
+      CodeUri: ${CodeUri}
+      Events:
+        GetRequest:
+          Type: Api
+          Properties:
+            RestApiId: !Ref ApiGatewayApi
+            Path: /hello
+            Method: GET
+            
+Outputs:
+  ApiUrl:
+    Description: API endpoint URL
+    Value: !Sub https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/${stage}

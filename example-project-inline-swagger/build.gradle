@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+    id 'com.github.kaklakariada.aws-sam-deploy' version '0.1.1'
+}
+
+repositories {
+    jcenter()
+}
+
+version = '0.0.1'
+
+ext {
+    deployStage = project.hasProperty('stage') ? project.properties['stage'] : 'test'
+}
+
+serverless {
+    currentStage = deployStage
+    defaultAwsProfile = 'default'
+    defaultAwsRegion = awsRegion
+    defaultDeploymentBucket = awsDeploymentBucket
+    stages {
+        test {
+            // use default values
+        }
+        prelive {
+            awsRegion = 'eu-west-1'
+            awsProfile = 'prelive-profile'
+            deploymentBucket = 'prelive-bucket'
+        }
+    }
+    api {
+        stackName = "${project.name}-${deployStage}"
+        samTemplate = file('template.yml')
+    }
+}
+
+dependencies {
+    compile 'com.amazonaws:aws-lambda-java-core:1.1.0'
+}
