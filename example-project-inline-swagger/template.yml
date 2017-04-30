@@ -8,23 +8,24 @@ Resources:
     Properties:
       StageName: ${stage}
       Variables:
-        GetLambdaFunctionName: !Ref GetFunction
         stage: ${stage}
       DefinitionBody:
-            swagger: 2.0
-            info:
-              title:
-                Ref: AWS::StackName
-            paths:
-              "/get":
-                get:
-                  x-amazon-apigateway-integration:
-                    httpMethod: POST
-                    type: aws_proxy
-                    uri:
-                      Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetFunction.Arn}/invocations
-                  responses: {}
-            swagger: '2.0'
+        swagger: '2.0'
+        info:
+          title:
+            Ref: AWS::StackName
+        paths:
+          "/hello":
+            get:
+              x-amazon-apigateway-integration:
+                passthroughBehavior: when_no_match
+                httpMethod: POST
+                type: aws_proxy
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${GetFunction.Arn}/invocations
+              responses:
+                default:
+                  statusCode: 200
 
   GetFunction:
     Type: AWS::Serverless::Function
