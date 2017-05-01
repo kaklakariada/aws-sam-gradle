@@ -48,7 +48,9 @@ public class ChangeSetCreateCompleteWaitCondition implements WaitCondition {
 
 	@Override
 	public boolean isFailure(String status) {
-		return status.toUpperCase().contains("FAILED") || status.equalsIgnoreCase("UPDATE_ROLLBACK_COMPLETE");
+		return status.toUpperCase().contains("FAILED") //
+				|| status.equalsIgnoreCase("UPDATE_ROLLBACK_COMPLETE") //
+				|| status.equalsIgnoreCase("ROLLBACK_IN_PROGRESS");
 	}
 
 	private DescribeChangeSetResult getChangeSetStatus() {
