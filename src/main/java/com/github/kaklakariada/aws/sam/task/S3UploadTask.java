@@ -18,10 +18,16 @@
 package com.github.kaklakariada.aws.sam.task;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
 import java.time.Instant;
 
 import org.gradle.api.DefaultTask;
+import org.gradle.api.Task;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.Internal;
@@ -42,10 +48,59 @@ public class S3UploadTask extends DefaultTask {
 	@Input
 	public SamConfig config;
 
+	private AmazonS3 s3Client;
+
+	public S3UploadTask() {
+		getOutputs().upToDateWhen(this::upToDateWhen);
+	}
+
+	private boolean upToDateWhen(Task task) {
+		return objectExistsInBucket(calculateS3Key());
+	}
+
+	private static byte[] createChecksum(File file) {
+		try (InputStream fis = new FileInputStream(file)) {
+
+			final byte[] buffer = new byte[1024];
+			final MessageDigest complete = MessageDigest.getInstance("MD5");
+			int numRead;
+
+			do {
+				numRead = fis.read(buffer);
+				if (numRead > 0) {
+					complete.update(buffer, 0, numRead);
+				}
+			} while (numRead != -1);
+
+			return complete.digest();
+		} catch (final IOException | NoSuchAlgorithmException e) {
+			throw new RuntimeException("Error calculating md5 sum for file " + file, e);
+		}
+	}
+
+	private static String getMD5Checksum(File file) {
+		final byte[] b = createChecksum(file);
+		return convertBytesToString(b);
+	}
+
+	private static String convertBytesToString(final byte[] b) {
+		String result = "";
+		for (int i = 0; i < b.length; i++) {
+			result += Integer.toString((b[i] & 0xff) + 0x100, 16).substring(1);
+		}
+		return result;
+	}
+
 	@TaskAction
 	public void uploadFileToS3() {
-		final AmazonS3 s3Client = config.getAwsClientFactory().create(AmazonS3Client.builder());
-		upload(s3Client, calculateS3Key());
+		upload(calculateS3Key());
+	}
+
+	private AmazonS3 getS3Client() {
+		if (s3Client == null) {
+			s3Client = config.getAwsClientFactory().create(AmazonS3Client.builder());
+		}
+		return s3Client;
 	}
 
 	@Internal
@@ -55,19 +110,24 @@ public class S3UploadTask extends DefaultTask {
 
 	private String calculateS3Key() {
 		final String version = getProject().getVersion().toString();
-		return getProject().getName() + "/" + version + "/" + config.getDeploymentTimestamp() + "/" + file.getName();
+		final String md5Checksum = getMD5Checksum(file);
+		return getProject().getName() + "/" + version + "/" + md5Checksum + "/" + file.getName();
 	}
 
-	private void upload(final AmazonS3 s3Client, final String key) {
-		if (!s3Client.doesObjectExist(config.getDeploymentBucket(), key)) {
-			transferFileToS3(s3Client, key);
+	private void upload(final String key) {
+		if (!objectExistsInBucket(key)) {
+			transferFileToS3(key);
 		}
 	}
 
-	private void transferFileToS3(final AmazonS3 s3Client, final String key) {
+	private boolean objectExistsInBucket(final String key) {
+		return getS3Client().doesObjectExist(config.getDeploymentBucket(), key);
+	}
+
+	private void transferFileToS3(final String key) {
 		final long fileSizeMb = file.length() / (1024 * 1024);
 		getLogger().info("Uploading {} MB from file {} to {}", fileSizeMb, file, getS3Url());
-		final TransferManager transferManager = TransferManagerBuilder.standard().withS3Client(s3Client).build();
+		final TransferManager transferManager = getTransferManager();
 		final Instant start = Instant.now();
 		final Upload upload = transferManager.upload(config.getDeploymentBucket(), key, file);
 		try {
@@ -77,5 +137,9 @@ public class S3UploadTask extends DefaultTask {
 			Thread.currentThread().interrupt();
 			throw new AssertionError("Upload interrupted", e);
 		}
+	}
+
+	private TransferManager getTransferManager() {
+		return TransferManagerBuilder.standard().withS3Client(getS3Client()).build();
 	}
 }

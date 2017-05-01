@@ -38,7 +38,8 @@ public class ChangeSetCreateCompleteWaitCondition implements WaitCondition {
 
 	@Override
 	public String getFailureMessage() {
-		return getChangeSetStatus().toString();
+		final DescribeChangeSetResult changeSetStatus = getChangeSetStatus();
+		return changeSetStatus.getStatusReason() + " " + changeSetStatus.toString();
 	}
 
 	@Override
