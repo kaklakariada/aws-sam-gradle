@@ -44,7 +44,7 @@ public class S3UploadTask extends DefaultTask {
 
 	@TaskAction
 	public void uploadFileToS3() {
-		final AmazonS3 s3Client = AmazonS3Client.builder().withRegion(config.getRegion()).build();
+		final AmazonS3 s3Client = config.getAwsClientFactory().create(AmazonS3Client.builder());
 		upload(s3Client, calculateS3Key());
 	}
 
