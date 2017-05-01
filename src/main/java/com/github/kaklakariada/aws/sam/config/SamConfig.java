@@ -18,6 +18,7 @@
 package com.github.kaklakariada.aws.sam.config;
 
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Objects;
 
 import org.gradle.api.NamedDomainObjectContainer;
@@ -30,7 +31,7 @@ import groovy.lang.Closure;
 
 public class SamConfig {
 	private final NamedDomainObjectContainer<Stage> stages;
-	private final long deploymentTimestamp;
+	private final Instant deploymentTimestamp;
 	private final Project projct;
 
 	public String currentStage;
@@ -42,7 +43,7 @@ public class SamConfig {
 	public SamConfig(Project projct, NamedDomainObjectContainer<Stage> stages) {
 		this.projct = projct;
 		this.stages = stages;
-		this.deploymentTimestamp = System.currentTimeMillis();
+		this.deploymentTimestamp = Instant.now();
 	}
 
 	public void api(Closure<?> config) {
@@ -76,7 +77,7 @@ public class SamConfig {
 		return profile != null ? profile : defaultAwsProfile;
 	}
 
-	public long getDeploymentTimestamp() {
+	public Instant getDeploymentTimestamp() {
 		return deploymentTimestamp;
 	}
 
