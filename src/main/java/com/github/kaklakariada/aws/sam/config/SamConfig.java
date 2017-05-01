@@ -86,8 +86,8 @@ public class SamConfig {
 
 	@Override
 	public String toString() {
-		return "SamConfig [stages=" + stages + ", deploymentTimestamp=" + deploymentTimestamp + ", projct=" + projct
-				+ ", currentStage=" + currentStage + ", api=" + api + ", defaultAwsRegion=" + defaultAwsRegion
+		return "SamConfig [stages=" + stages.getAsMap() + ", deploymentTimestamp=" + deploymentTimestamp + ", projct="
+				+ projct + ", currentStage=" + currentStage + ", api=" + api + ", defaultAwsRegion=" + defaultAwsRegion
 				+ ", defaultAwsProfile=" + defaultAwsProfile + ", defaultDeploymentBucket=" + defaultDeploymentBucket
 				+ "]";
 	}

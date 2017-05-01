@@ -17,12 +17,18 @@
  */
 package com.github.kaklakariada.aws.sam.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 
 public class AwsClientFactory {
+
+	private static final Logger LOG = LoggerFactory.getLogger(AwsClientFactory.class);
+
 	private final Regions region;
 	private final AWSCredentialsProvider credentialsProvider;
 
@@ -32,6 +38,7 @@ public class AwsClientFactory {
 	}
 
 	public static AwsClientFactory create(Regions region, String profileName) {
+		LOG.info("Using region {} and profile {}", region, profileName);
 		final AWSCredentialsProvider credentialsProvider = new ProfileCredentialsProvider(profileName);
 		return new AwsClientFactory(region, credentialsProvider);
 	}
