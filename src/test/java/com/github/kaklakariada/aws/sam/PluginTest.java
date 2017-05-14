@@ -18,7 +18,9 @@
 package com.github.kaklakariada.aws.sam;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.BufferedReader;
@@ -84,6 +86,16 @@ public class PluginTest {
 				"clean", "deploy");
 		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
 		assertApiGatewayDeployed();
+	}
+
+	@Test
+	public void testWriteStackOutput() throws ClientProtocolException, IOException {
+		runBuild(INLINE_SWAGGER_PROJECT_DIR, //
+				"clean", "writeStackOutput");
+		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
+		assertEquals(buildResult.task(":writeStackOutput").getOutcome(), TaskOutcome.SUCCESS);
+		assertApiGatewayDeployed();
+		assertThat(new File(INLINE_SWAGGER_PROJECT_DIR, "build/stack-output.properties").exists(), equalTo(true));
 	}
 
 	private void assertApiGatewayDeployed() throws IOException, ClientProtocolException {

@@ -40,6 +40,7 @@ import com.github.kaklakariada.aws.sam.task.DeleteStackTask;
 import com.github.kaklakariada.aws.sam.task.DeployTask;
 import com.github.kaklakariada.aws.sam.task.ReplacePlaceholerTask;
 import com.github.kaklakariada.aws.sam.task.S3UploadTask;
+import com.github.kaklakariada.aws.sam.task.WriteStackOutputToFileTask;
 
 import groovy.lang.Closure;
 
@@ -78,8 +79,18 @@ public class AwsSamDeployPlugin implements Plugin<Project> {
 			final ReplacePlaceholerTask updateSwaggerTask = createUpdateSwaggerTask(config.api.swaggerDefinition);
 			uploadSwaggerTask = createUploadSwaggerTask(updateSwaggerTask);
 		}
-		createDeployTask(uploadZipTask, uploadSwaggerTask);
+		final DeployTask deployTask = createDeployTask(uploadZipTask, uploadSwaggerTask);
+		createWriteStackOutputTask(deployTask);
 		createDeleteStackTask();
+	}
+
+	private void createWriteStackOutputTask(DeployTask deployTask) {
+		final WriteStackOutputToFileTask task = createTask("writeStackOutput", WriteStackOutputToFileTask.class);
+		task.setDescription("Write stack output to properties file");
+		task.setGroup(TASK_GROUP);
+		task.config = config;
+		task.outputFile = new File(project.getBuildDir(), "stack-output.properties");
+		task.dependsOn(deployTask);
 	}
 
 	private DeployTask createDeployTask(S3UploadTask uploadZipTask, S3UploadTask uploadSwaggerTask) {

@@ -21,6 +21,7 @@ import static java.util.Collections.emptyList;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 import org.gradle.api.logging.Logging;
@@ -29,6 +30,7 @@ import org.slf4j.Logger;
 import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClientBuilder;
 import com.amazonaws.services.cloudformation.model.ChangeSetType;
+import com.amazonaws.services.cloudformation.model.Output;
 import com.amazonaws.services.cloudformation.model.Parameter;
 import com.github.kaklakariada.aws.sam.config.SamConfig;
 import com.github.kaklakariada.aws.sam.service.poll.CloudFormationPollingService;
@@ -79,8 +81,12 @@ public class DeployService {
 	}
 
 	private void logStackOutput() {
-		cloudFormationService.getOutputParameters(config.getStackName())
+		getStackOutput()
 				.forEach(output -> LOG.info("Stack output {} = {}", output.getOutputKey(), output.getOutputValue()));
+	}
+
+	public List<Output> getStackOutput() {
+		return cloudFormationService.getOutputParameters(config.getStackName());
 	}
 
 	private String updateTemplateBody(String templateBody, String codeUri, String swaggerDefinitionUri) {
