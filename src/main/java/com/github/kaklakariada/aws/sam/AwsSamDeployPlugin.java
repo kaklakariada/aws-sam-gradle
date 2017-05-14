@@ -149,8 +149,8 @@ public class AwsSamDeployPlugin implements Plugin<Project> {
 			delegate.from(project.getConfigurations().getByName("runtime"));
 		}));
 		task.into("", closure(task, CopySpec.class, (delegate) -> {
-			delegate.from(project.getTasks().getByPath(":compileJava"),
-					project.getTasks().getByPath(":processResources"));
+			delegate.from(project.getTasks().getByName("compileJava"),
+					project.getTasks().getByName("processResources"));
 		}));
 		return task;
 	}
