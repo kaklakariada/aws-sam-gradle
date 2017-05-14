@@ -99,11 +99,13 @@ public class AwsSamDeployPlugin implements Plugin<Project> {
 		task.setGroup(TASK_GROUP);
 		if (uploadSwaggerTask != null) {
 			task.dependsOn(uploadSwaggerTask);
-			task.swaggerUri = uploadSwaggerTask.getS3Url();
+			task.swaggerUri = uploadSwaggerTask::getS3Url;
+		} else {
+			task.swaggerUri = () -> null;
 		}
 		task.dependsOn(uploadZipTask);
 		task.config = config;
-		task.codeUri = uploadZipTask.getS3Url();
+		task.codeUri = uploadZipTask::getS3Url;
 		return task;
 	}
 
