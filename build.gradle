@@ -8,7 +8,7 @@ repositories {
    jcenter()
 }
 
-version = '0.2.1'
+version = '0.3.0'
 group = 'com.github.kaklakariada.aws'
 
 ext {
