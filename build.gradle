@@ -54,6 +54,8 @@ test {
     }
 }
 
+test.onlyIf { rootProject.name == 'aws-sam-gradle' }
+
 license {
     header = file('gradle/license-header.txt')
     strictCheck = true
