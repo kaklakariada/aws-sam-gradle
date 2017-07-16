@@ -8,11 +8,11 @@ repositories {
    jcenter()
 }
 
-version = '0.3.0'
+version = '0.4.0'
 group = 'com.github.kaklakariada.aws'
 
 ext {
-  awsApiVersion = '1.11.136'
+  awsApiVersion = '1.11.163'
   gradlePluginId = 'com.github.kaklakariada.aws-sam-deploy'
 }
 
