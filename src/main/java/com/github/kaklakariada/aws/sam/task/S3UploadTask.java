@@ -48,6 +48,7 @@ public class S3UploadTask extends DefaultTask {
 	@Input
 	public SamConfig config;
 
+	@Internal
 	private AmazonS3 s3Client;
 
 	public S3UploadTask() {
@@ -127,7 +128,7 @@ public class S3UploadTask extends DefaultTask {
 	private void transferFileToS3(final String key) {
 		final long fileSizeMb = file.length() / (1024 * 1024);
 		getLogger().info("Uploading {} MB from file {} to {}", fileSizeMb, file, getS3Url());
-		final TransferManager transferManager = getTransferManager();
+		final TransferManager transferManager = createTransferManager();
 		final Instant start = Instant.now();
 		final Upload upload = transferManager.upload(config.getDeploymentBucket(), key, file);
 		try {
@@ -139,7 +140,7 @@ public class S3UploadTask extends DefaultTask {
 		}
 	}
 
-	private TransferManager getTransferManager() {
+	private TransferManager createTransferManager() {
 		return TransferManagerBuilder.standard().withS3Client(getS3Client()).build();
 	}
 }
