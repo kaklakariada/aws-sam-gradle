@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 
 import com.amazonaws.services.cloudformation.model.Parameter;
 import com.github.kaklakariada.aws.sam.config.SamConfig;
+import com.github.kaklakariada.aws.sam.config.SamConfigDsl;
 import com.github.kaklakariada.aws.sam.config.Stage;
 import com.github.kaklakariada.aws.sam.service.AwsMetadataService;
 import com.github.kaklakariada.aws.sam.task.DeleteStackTask;
@@ -56,27 +57,25 @@ public class AwsSamDeployPlugin implements Plugin<Project> {
 		this.log = project.getLogger();
 		this.config = createConfigDsl();
 		log.info("Initialize AwsSam plugin...");
-		project.afterEvaluate((p) -> createTasks());
+		project.afterEvaluate(p -> createTasks());
 	}
 
 	private SamConfig createConfigDsl() {
 		log.debug("Setup serverless config DSL");
 		final NamedDomainObjectContainer<Stage> stages = project.container(Stage.class);
-		final SamConfig samConfig = project.getExtensions().create("serverless", SamConfig.class, project, stages);
+		final SamConfigDsl samConfig = project.getExtensions().create("serverless", SamConfigDsl.class, project,
+				stages);
 		((ExtensionAware) samConfig).getExtensions().add("stages", stages);
-		return samConfig;
+		return new SamConfig(project, samConfig);
 	}
 
 	private void createTasks() {
 		log.info("Creating tasks using config {}", config);
-		if (config.api == null) {
-			throw new IllegalStateException("serverless.api configuration is missing");
-		}
 		final Zip zipTask = createBuildZipTask();
 		final S3UploadTask uploadZipTask = createUploadZipTask(zipTask);
 		S3UploadTask uploadSwaggerTask = null;
-		if (config.api.swaggerDefinition != null) {
-			final ReplacePlaceholerTask updateSwaggerTask = createUpdateSwaggerTask(config.api.swaggerDefinition);
+		if (config.getSwaggerDefinition() != null) {
+			final ReplacePlaceholerTask updateSwaggerTask = createUpdateSwaggerTask(config.getSwaggerDefinition());
 			uploadSwaggerTask = createUploadSwaggerTask(updateSwaggerTask);
 		}
 		final DeployTask deployTask = createDeployTask(uploadZipTask, uploadSwaggerTask);
@@ -113,7 +112,7 @@ public class AwsSamDeployPlugin implements Plugin<Project> {
 		final ReplacePlaceholerTask task = createTask("updateSwagger", ReplacePlaceholerTask.class);
 		final AwsMetadataService awsMetadataService = new AwsMetadataService(config);
 		task.parameters = asList(
-				new Parameter().withParameterKey("region").withParameterValue(config.getRegion().getName()),
+				new Parameter().withParameterKey("region").withParameterValue(config.getActiveRegion().getName()),
 				new Parameter().withParameterKey("accountId").withParameterValue(awsMetadataService.getAccountId()));
 		task.input = swaggerDefinition;
 		task.output = new File(project.getBuildDir(), task.input.getName());

@@ -17,64 +17,56 @@
  */
 package com.github.kaklakariada.aws.sam.config;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Objects;
 
-import org.gradle.api.NamedDomainObjectContainer;
 import org.gradle.api.Project;
 
 import com.amazonaws.regions.Regions;
 import com.github.kaklakariada.aws.sam.service.AwsClientFactory;
 
-import groovy.lang.Closure;
-
 public class SamConfig {
-	private final NamedDomainObjectContainer<Stage> stages;
 	private final Instant deploymentTimestamp;
 	private final Project projct;
+	private final SamConfigDsl configDsl;
 
-	public String currentStage;
-	public ApiConfig api;
-	public String defaultAwsRegion;
-	public String defaultAwsProfile;
-	public String defaultDeploymentBucket;
-
-	public SamConfig(Project projct, NamedDomainObjectContainer<Stage> stages) {
+	public SamConfig(Project projct, SamConfigDsl configDsl) {
 		this.projct = projct;
-		this.stages = stages;
+		this.configDsl = configDsl;
 		this.deploymentTimestamp = Instant.now();
 	}
 
-	public void api(Closure<?> config) {
-		api = (ApiConfig) projct.configure(new ApiConfig(), config);
+	public Stage getStage() {
+		return configDsl.stages.getByName(Objects.requireNonNull(getStageName(), "currentStage"));
 	}
 
-	private Stage getStage() {
-		return stages.getByName(Objects.requireNonNull(currentStage, "currentStage"));
+	public String getStageName() {
+		return configDsl.activeStage;
 	}
 
 	public String getStackName() {
-		return api.stackName;
+		return configDsl.api.stackName;
 	}
 
 	public Path getBuildDir() {
 		return projct.getBuildDir().toPath().toAbsolutePath();
 	}
 
-	public Regions getRegion() {
+	public Regions getActiveRegion() {
 		final String stageRegion = getStage().awsRegion;
-		return Regions.fromName(stageRegion != null ? stageRegion : defaultAwsRegion);
+		return Regions.fromName(stageRegion != null ? stageRegion : configDsl.defaultAwsRegion);
 	}
 
 	public String getDeploymentBucket() {
-		final String stageBucket = getStage().deploymentBucket;
-		return stageBucket != null ? stageBucket : defaultDeploymentBucket;
+		final String stageBucket = getStage().deployBucket;
+		return stageBucket != null ? stageBucket : configDsl.defaultDeployBucket;
 	}
 
-	public String getAwsProfile() {
+	private String getActiveAwsProfile() {
 		final String profile = getStage().awsProfile;
-		return profile != null ? profile : defaultAwsProfile;
+		return profile != null ? profile : configDsl.defaultAwsProfile;
 	}
 
 	public Instant getDeploymentTimestamp() {
@@ -82,14 +74,21 @@ public class SamConfig {
 	}
 
 	public AwsClientFactory getAwsClientFactory() {
-		return AwsClientFactory.create(getRegion(), getAwsProfile());
+		return AwsClientFactory.create(getActiveRegion(), getActiveAwsProfile());
 	}
 
-	@Override
-	public String toString() {
-		return "SamConfig [stages=" + stages.getAsMap() + ", deploymentTimestamp=" + deploymentTimestamp + ", projct="
-				+ projct + ", currentStage=" + currentStage + ", api=" + api + ", defaultAwsRegion=" + defaultAwsRegion
-				+ ", defaultAwsProfile=" + defaultAwsProfile + ", defaultDeploymentBucket=" + defaultDeploymentBucket
-				+ "]";
+	public File getSwaggerDefinition() {
+		return getApi().swaggerDefinition;
+	}
+
+	public Path getSamTemplate() {
+		return getApi().samTemplate.toPath();
+	}
+
+	private ApiConfigDsl getApi() {
+		if (configDsl.api == null) {
+			throw new IllegalStateException("serverless.api configuration is missing");
+		}
+		return configDsl.api;
 	}
 }

@@ -61,7 +61,6 @@ public class S3UploadTask extends DefaultTask {
 
 	private static byte[] createChecksum(File file) {
 		try (InputStream fis = new FileInputStream(file)) {
-
 			final byte[] buffer = new byte[1024];
 			final MessageDigest complete = MessageDigest.getInstance("MD5");
 			int numRead;

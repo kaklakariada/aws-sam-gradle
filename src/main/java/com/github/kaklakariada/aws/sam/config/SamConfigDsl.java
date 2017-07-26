@@ -17,19 +17,27 @@
  */
 package com.github.kaklakariada.aws.sam.config;
 
-public class Stage {
-	public final String name;
-	public String awsRegion;
-	public String awsProfile;
-	public String deployBucket;
+import org.gradle.api.NamedDomainObjectContainer;
+import org.gradle.api.Project;
 
-	public Stage(String name) {
-		this.name = name;
+import groovy.lang.Closure;
+
+public class SamConfigDsl {
+	private final Project project;
+
+	public final NamedDomainObjectContainer<Stage> stages;
+	public ApiConfigDsl api;
+	public String activeStage;
+	public String defaultAwsRegion;
+	public String defaultAwsProfile;
+	public String defaultDeployBucket;
+
+	public SamConfigDsl(Project projct, NamedDomainObjectContainer<Stage> stages) {
+		this.project = projct;
+		this.stages = stages;
 	}
 
-	@Override
-	public String toString() {
-		return "Stage [name=" + name + ", awsRegion=" + awsRegion + ", awsProfile=" + awsProfile + ", deploymentBucket="
-				+ deployBucket + "]";
+	public void api(Closure<?> config) {
+		api = (ApiConfigDsl) project.configure(new ApiConfigDsl(), config);
 	}
 }

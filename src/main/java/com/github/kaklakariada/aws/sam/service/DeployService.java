@@ -92,7 +92,7 @@ public class DeployService {
 	private String updateTemplateBody(String templateBody, String codeUri, String swaggerDefinitionUri) {
 		final Collection<Parameter> parameters = new ArrayList<>();
 		parameters.add(new Parameter().withParameterKey("CodeUri").withParameterValue(Objects.requireNonNull(codeUri)));
-		parameters.add(new Parameter().withParameterKey("stage").withParameterValue(config.currentStage));
+		parameters.add(new Parameter().withParameterKey("stage").withParameterValue(config.getStageName()));
 		if (swaggerDefinitionUri != null) {
 			parameters.add(new Parameter().withParameterKey("DefinitionUri").withParameterValue(swaggerDefinitionUri));
 		}

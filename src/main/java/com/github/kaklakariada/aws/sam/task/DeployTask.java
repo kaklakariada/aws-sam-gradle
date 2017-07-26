@@ -39,7 +39,7 @@ public class DeployTask extends DefaultTask {
 
 	@TaskAction
 	public void uploadFileToS3() throws IOException, InterruptedException {
-		final String templateBody = new TemplateService().loadFile(config.api.samTemplate.toPath());
+		final String templateBody = new TemplateService().loadFile(config.getSamTemplate());
 		final DeployService deployService = new DeployService(config);
 		deployService.deploy(templateBody, codeUri.get(), swaggerUri.get());
 	}

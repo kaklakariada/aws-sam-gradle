@@ -28,8 +28,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -128,10 +132,31 @@ public class PluginTest {
 		return outputValue;
 	}
 
+	private Properties loadTestProperties() {
+		final Path propertiesPath = Paths.get("test.properties");
+		final Properties properties = new Properties();
+		try {
+			properties.load(Files.newInputStream(propertiesPath));
+		} catch (final IOException e) {
+			throw new AssertionError("Error loading " + propertiesPath.toAbsolutePath(), e);
+		}
+		return properties;
+	}
+
+	private List<String> getCustomProjectParameters() {
+		final Properties properties = loadTestProperties();
+		final List<String> parameters = asList("-PawsProfile=" + properties.getProperty("awsProfile"),
+				"-PawsRegion=" + properties.getProperty("awsRegion"),
+				"-PawsDeployBucket=" + properties.getProperty("awsDeployBucket"));
+		LOG.info("Using custom project parameters {}", parameters);
+		return parameters;
+	}
+
 	private void runBuild(File projectDir, String... arguments) {
 		final List<String> argsList = new ArrayList<>();
 		argsList.addAll(asList(arguments));
 		argsList.addAll(asList("-Pstage=" + STAGE, "--info", "--stacktrace", "--max-workers", "1"));
+		argsList.addAll(getCustomProjectParameters());
 		buildResult = GradleRunner.create().withProjectDir(projectDir.getAbsoluteFile()) //
 				.withPluginClasspath() //
 				.withArguments(argsList) //

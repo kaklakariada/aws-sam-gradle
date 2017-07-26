@@ -19,7 +19,7 @@ package com.github.kaklakariada.aws.sam.config;
 
 import java.io.File;
 
-public class ApiConfig {
+public class ApiConfigDsl {
 	public File samTemplate;
 	public File swaggerDefinition;
 	public String stackName;
