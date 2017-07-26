@@ -14,10 +14,10 @@ ext {
 }
 
 serverless {
-    currentStage = deployStage
-    defaultAwsProfile = 'default'
-    defaultAwsRegion = awsRegion
-    defaultDeploymentBucket = awsDeploymentBucket
+    activeStage = deployStage
+    defaultAwsProfile = project.properties['awsProfile']
+    defaultAwsRegion = project.properties['awsRegion']
+    defaultDeployBucket = project.properties['awsDeployBucket']
     stages {
         stest {
             // use default values
@@ -25,14 +25,14 @@ serverless {
         prelive {
             awsRegion = 'eu-west-1'
             awsProfile = 'prelive-profile'
-            deploymentBucket = 'prelive-bucket'
+            deployBucket = 'prelive-bucket'
         }
     }
     api {
         stackName = "${project.name}-${deployStage}"
         samTemplate = file('template.yml')
-        swaggerDefinition = file('swagger.yaml')
     }
+
 }
 
 dependencies {
