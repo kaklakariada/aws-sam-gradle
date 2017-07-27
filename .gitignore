@@ -5,3 +5,4 @@ build/
 /.project
 /.settings/org.eclipse.buildship.core.prefs
 /test.properties
+/iam-deploy-s3-policy.json

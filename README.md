@@ -48,6 +48,12 @@ serverless {
 }
 ```
 
+### Required permissions
+
+```bash
+aws --profile $profile iam create-policy-version --policy-arn $policy_arn --policy-document file://iam-deploy-policy.json --set-as-default
+```
+
 ### Deployment
 
 Deploy your app with `./gradlew -Pstage=<myStage> deploy -i`.

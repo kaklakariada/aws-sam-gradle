@@ -1,0 +1,79 @@
+{
+	"Version": "2012-10-17",
+	"Statement": [
+		{
+			"Sid": "CloudFormation",
+			"Effect": "Allow",
+			"Action": [
+				"cloudformation:CreateStack",
+				"cloudformation:DeleteStack"
+			],
+			"Resource": [
+				"*"
+			]
+		},
+		{
+			"Sid": "AllowCloudFormation",
+			"Effect": "Allow",
+			"Action": [
+				"cloudformation:DescribeStacks",
+				"cloudformation:CreateStack",
+				"cloudformation:DeleteStack",
+				"cloudformation:UpdateStack",
+				"cloudformation:CreateChangeSet",
+				"cloudformation:DescribeChangeSet",
+				"cloudformation:ExecuteChangeSet"
+			],
+			"Resource": [
+				"*"
+			]
+		},
+		{
+			"Sid": "AllowIam",
+			"Effect": "Allow",
+			"Action": [
+				"iam:CreateRole",
+				"iam:DeleteRole",
+				"iam:AttachRolePolicy",
+				"iam:DetachRolePolicy",
+				"iam:GetRole",
+				"iam:PassRole"
+			],
+			"Resource": [
+				"*"
+			]
+		},
+		{
+			"Sid": "AllowLambda",
+			"Effect": "Allow",
+			"Action": [
+				"lambda:CreateFunction",
+				"lambda:DeleteFunction",
+				"lambda:UpdateFunction",
+				"lambda:UpdateFunctionCode",
+				"lambda:GetFunctionConfiguration",
+				"lambda:AddPermission",
+				"lambda:RemovePermission",
+				"lambda:ListTags",
+				"lambda:TagResource",
+				"lambda:UntagResource"
+			],
+			"Resource": [
+				"*"
+			]
+		},
+		{
+			"Sid": "AllowApiGateway",
+			"Effect": "Allow",
+			"Action": [
+				"apigateway:POST",
+				"apigateway:PATCH",
+				"apigateway:DELETE",
+				"apigateway:GET"
+			],
+			"Resource": [
+				"*"
+			]
+		}
+	]
+}
