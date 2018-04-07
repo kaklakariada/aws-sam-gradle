@@ -8,6 +8,9 @@ repositories {
    jcenter()
 }
 
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
 version = '0.4.0'
 group = 'com.github.kaklakariada.aws'
 
