@@ -1,6 +1,6 @@
 plugins {
     id 'java-gradle-plugin'
-    id 'com.gradle.plugin-publish' version '0.9.7'
+    id 'com.gradle.plugin-publish' version '0.9.10'
     id 'com.github.hierynomus.license' version '0.14.0'
 }
 
@@ -15,7 +15,7 @@ version = '0.4.0'
 group = 'com.github.kaklakariada.aws'
 
 ext {
-  awsApiVersion = '1.11.163'
+  awsApiVersion = '1.11.311'
   gradlePluginId = 'com.github.kaklakariada.aws-sam-deploy'
 }
 
