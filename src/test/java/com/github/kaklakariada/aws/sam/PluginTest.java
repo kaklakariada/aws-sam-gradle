@@ -126,7 +126,7 @@ public class PluginTest {
 	private String getStackOutput(String outputParamName) {
 		final Pattern pattern = Pattern.compile("(?ms).*^Stack output " + outputParamName + " = ([^\n\r]*)$.*");
 		final Matcher matcher = pattern.matcher(buildResult.getOutput());
-		assertTrue("Pattern '" + pattern + "' does not match output", matcher.matches());
+		assertTrue("Pattern '" + pattern + "' does not match output:\n" + buildResult.getOutput(), matcher.matches());
 		final String outputValue = matcher.group(1);
 		LOG.info("Got output parameter '{}' = '{}'", outputParamName, outputValue);
 		return outputValue;
