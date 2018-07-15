@@ -30,16 +30,13 @@ class StatusPollingService {
 	private static final Logger LOG = Logging.getLogger(StatusPollingService.class);
 
 	public void waitForStatus(WaitCondition condition) {
-		new Poller((waitingDuration) -> {
+		new Poller(waitingDuration -> {
 			final String status = condition.getStatus();
 			LOG.info("Got status {} after {}", status, waitingDuration);
 			if (condition.isFailure(status)) {
 				throw new DeploymentException("Got failure status " + status + ": " + condition.getFailureMessage());
 			}
-			if (condition.isSuccess(status)) {
-				return true;
-			}
-			return false;
+			return condition.isSuccess(status);
 		}).waitUntilFinished();
 	}
 
@@ -74,6 +71,7 @@ class StatusPollingService {
 			try {
 				Thread.sleep(2000);
 			} catch (final InterruptedException e) {
+				Thread.currentThread().interrupt();
 				throw new DeploymentException("Exception while sleeping", e);
 			}
 		}
