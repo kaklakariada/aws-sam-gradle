@@ -93,7 +93,7 @@ public class AwsSamDeployPlugin implements Plugin<Project> {
 	}
 
 	private DeployTask createDeployTask(S3UploadTask uploadZipTask, S3UploadTask uploadSwaggerTask) {
-		final DeployTask task = createTask("deploy", DeployTask.class);
+		final DeployTask task = createTask(TASK_GROUP, DeployTask.class);
 		task.setDescription("Deploy stack to AWS");
 		task.setGroup(TASK_GROUP);
 		if (uploadSwaggerTask != null) {
@@ -144,13 +144,10 @@ public class AwsSamDeployPlugin implements Plugin<Project> {
 		task.setDescription("Build lambda zip");
 		task.setGroup(TASK_GROUP);
 		task.setBaseName(project.getName());
-		task.into("lib", closure(task, CopySpec.class, (delegate) -> {
-			delegate.from(project.getConfigurations().getByName("runtime"));
-		}));
-		task.into("", closure(task, CopySpec.class, (delegate) -> {
-			delegate.from(project.getTasks().getByName("compileJava"),
-					project.getTasks().getByName("processResources"));
-		}));
+		task.into("lib", closure(task, CopySpec.class,
+				delegate -> delegate.from(project.getConfigurations().getByName("runtime"))));
+		task.into("", closure(task, CopySpec.class, delegate -> delegate
+				.from(project.getTasks().getByName("compileJava"), project.getTasks().getByName("processResources"))));
 		return task;
 	}
 

@@ -68,9 +68,7 @@ public class CloudformationService {
 			return describeStack(stackName).stream() //
 					.peek(s -> LOG.info("Found stack {}", s)) //
 					.filter(s -> s.getStackName().equals(stackName)) //
-					.filter(s -> !s.getStackStatus().equals("REVIEW_IN_PROGRESS")) //
-					.findAny() //
-					.isPresent();
+					.anyMatch(s -> !s.getStackStatus().equals("REVIEW_IN_PROGRESS"));
 		} catch (final AmazonCloudFormationException e) {
 			if (e.getStatusCode() == 400) {
 				LOG.trace("Got exception", e);
