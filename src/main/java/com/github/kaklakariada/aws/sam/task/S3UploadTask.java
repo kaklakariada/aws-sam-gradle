@@ -27,7 +27,6 @@ import java.time.Duration;
 import java.time.Instant;
 
 import org.gradle.api.DefaultTask;
-import org.gradle.api.Task;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
 import org.gradle.api.tasks.Internal;
@@ -38,6 +37,7 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
+import com.github.kaklakariada.aws.sam.DeploymentException;
 import com.github.kaklakariada.aws.sam.config.SamConfig;
 
 public class S3UploadTask extends DefaultTask {
@@ -52,11 +52,7 @@ public class S3UploadTask extends DefaultTask {
 	private AmazonS3 s3Client;
 
 	public S3UploadTask() {
-		getOutputs().upToDateWhen(this::upToDateWhen);
-	}
-
-	private boolean upToDateWhen(Task task) {
-		return objectExistsInBucket(calculateS3Key());
+		getOutputs().upToDateWhen(task -> objectExistsInBucket(calculateS3Key()));
 	}
 
 	private static byte[] createChecksum(File file) {
@@ -74,7 +70,7 @@ public class S3UploadTask extends DefaultTask {
 
 			return complete.digest();
 		} catch (final IOException | NoSuchAlgorithmException e) {
-			throw new RuntimeException("Error calculating md5 sum for file " + file, e);
+			throw new DeploymentException("Error calculating md5 sum for file " + file, e);
 		}
 	}
 
@@ -84,11 +80,11 @@ public class S3UploadTask extends DefaultTask {
 	}
 
 	private static String convertBytesToString(final byte[] b) {
-		String result = "";
+		final StringBuilder result = new StringBuilder();
 		for (int i = 0; i < b.length; i++) {
-			result += Integer.toString((b[i] & 0xff) + 0x100, 16).substring(1);
+			result.append(Integer.toString((b[i] & 0xff) + 0x100, 16).substring(1));
 		}
-		return result;
+		return result.toString();
 	}
 
 	@TaskAction

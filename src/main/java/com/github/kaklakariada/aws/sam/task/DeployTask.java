@@ -17,7 +17,6 @@
  */
 package com.github.kaklakariada.aws.sam.task;
 
-import java.io.IOException;
 import java.util.function.Supplier;
 
 import org.gradle.api.DefaultTask;
@@ -38,7 +37,7 @@ public class DeployTask extends DefaultTask {
 	public SamConfig config;
 
 	@TaskAction
-	public void uploadFileToS3() throws IOException, InterruptedException {
+	public void uploadFileToS3() {
 		final String templateBody = new TemplateService().loadFile(config.getSamTemplate());
 		final DeployService deployService = new DeployService(config);
 		deployService.deploy(templateBody, codeUri.get(), swaggerUri.get());

@@ -63,24 +63,24 @@ public class PluginTest {
 	public void testDeployMinimalApp() {
 		runBuild(MINIMAL_PROJECT_DIR, //
 				"clean", "deploy");
-		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
+		assertEquals(TaskOutcome.SUCCESS, buildResult.task(":deploy").getOutcome());
 	}
 
 	@Test
 	public void testDeleteStack() {
 		runBuild(MINIMAL_PROJECT_DIR, //
 				"clean", "deploy");
-		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
+		assertEquals(TaskOutcome.SUCCESS, buildResult.task(":deploy").getOutcome());
 		runBuild(MINIMAL_PROJECT_DIR, //
 				"deleteStack");
-		assertEquals(buildResult.task(":deleteStack").getOutcome(), TaskOutcome.SUCCESS);
+		assertEquals(TaskOutcome.SUCCESS, buildResult.task(":deleteStack").getOutcome());
 	}
 
 	@Test
 	public void testDeploySwaggerApp() throws ClientProtocolException, IOException {
 		runBuild(SWAGGER_PROJECT_DIR, //
 				"clean", "deploy");
-		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
+		assertEquals(TaskOutcome.SUCCESS, buildResult.task(":deploy").getOutcome());
 		assertApiGatewayDeployed();
 	}
 
@@ -88,7 +88,7 @@ public class PluginTest {
 	public void testDeployInlineSwaggerApp() throws ClientProtocolException, IOException {
 		runBuild(INLINE_SWAGGER_PROJECT_DIR, //
 				"clean", "deploy");
-		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
+		assertEquals(TaskOutcome.SUCCESS, buildResult.task(":deploy").getOutcome());
 		assertApiGatewayDeployed();
 	}
 
@@ -96,8 +96,8 @@ public class PluginTest {
 	public void testWriteStackOutput() throws ClientProtocolException, IOException {
 		runBuild(INLINE_SWAGGER_PROJECT_DIR, //
 				"clean", "writeStackOutput");
-		assertEquals(buildResult.task(":deploy").getOutcome(), TaskOutcome.SUCCESS);
-		assertEquals(buildResult.task(":writeStackOutput").getOutcome(), TaskOutcome.SUCCESS);
+		assertEquals(TaskOutcome.SUCCESS, buildResult.task(":deploy").getOutcome());
+		assertEquals(TaskOutcome.SUCCESS, buildResult.task(":writeStackOutput").getOutcome());
 		assertApiGatewayDeployed();
 		assertThat(new File(INLINE_SWAGGER_PROJECT_DIR, "build/stack-output.properties").exists(), equalTo(true));
 	}

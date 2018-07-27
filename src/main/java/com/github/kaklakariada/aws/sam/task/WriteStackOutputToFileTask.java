@@ -32,6 +32,7 @@ import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 
 import com.amazonaws.services.cloudformation.model.Output;
+import com.github.kaklakariada.aws.sam.DeploymentException;
 import com.github.kaklakariada.aws.sam.config.SamConfig;
 import com.github.kaklakariada.aws.sam.service.DeployService;
 
@@ -43,7 +44,7 @@ public class WriteStackOutputToFileTask extends DefaultTask {
 	public SamConfig config;
 
 	@TaskAction
-	public void writeStackOutput() throws IOException, InterruptedException {
+	public void writeStackOutput() {
 		final DeployService deployService = new DeployService(config);
 		final List<Output> output = deployService.getStackOutput();
 		final Properties prop = new Properties();
@@ -51,6 +52,8 @@ public class WriteStackOutputToFileTask extends DefaultTask {
 
 		try (Writer writer = new OutputStreamWriter(new FileOutputStream(outputFile), StandardCharsets.UTF_8)) {
 			prop.store(writer, "Output of stack " + config.getStackName());
+		} catch (final IOException e) {
+			throw new DeploymentException("Error writing to file " + outputFile, e);
 		}
 	}
 }

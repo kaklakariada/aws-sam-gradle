@@ -38,7 +38,11 @@ abstract class StackStatusWaitCondition implements WaitCondition {
 
 	@Override
 	public String getStatus() {
-		return getStack().get().getStackStatus();
+		final Optional<Stack> stack = getStack();
+		if (!stack.isPresent()) {
+			throw new DeploymentException("Stack " + stackName + " not found");
+		}
+		return stack.get().getStackStatus();
 	}
 
 	@Override

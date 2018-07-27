@@ -17,8 +17,6 @@
  */
 package com.github.kaklakariada.aws.sam.task;
 
-import java.io.IOException;
-
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
@@ -32,7 +30,7 @@ public class DeleteStackTask extends DefaultTask {
 	public SamConfig config;
 
 	@TaskAction
-	public void uploadFileToS3() throws IOException, InterruptedException {
+	public void uploadFileToS3() {
 		final DeployService deployService = new DeployService(config);
 		deployService.deleteStack(config.getStackName());
 	}
