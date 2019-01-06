@@ -143,7 +143,7 @@ public class AwsSamDeployPlugin implements Plugin<Project> {
 		final Zip task = createTask("buildZip", Zip.class);
 		task.setDescription("Build lambda zip");
 		task.setGroup(TASK_GROUP);
-		task.setBaseName(project.getName());
+		task.getArchiveBaseName().set(project.getName());
 		task.into("lib", closure(task, CopySpec.class,
 				delegate -> delegate.from(project.getConfigurations().getByName("runtime"))));
 		task.into("", closure(task, CopySpec.class, delegate -> delegate
