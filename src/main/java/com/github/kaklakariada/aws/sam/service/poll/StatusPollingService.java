@@ -21,18 +21,22 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.function.Function;
 
-import org.gradle.api.logging.Logging;
-import org.slf4j.Logger;
+import org.gradle.api.logging.Logger;
 
 import com.github.kaklakariada.aws.sam.DeploymentException;
 
 class StatusPollingService {
-	private static final Logger LOG = Logging.getLogger(StatusPollingService.class);
+
+	private final Logger logger;
+
+	public StatusPollingService(Logger logger) {
+		this.logger = logger;
+	}
 
 	public void waitForStatus(WaitCondition condition) {
 		new Poller(waitingDuration -> {
 			final String status = condition.getStatus();
-			LOG.info("Got status {} after {}", status, waitingDuration);
+			logger.lifecycle("Got status {} after {}", status, waitingDuration);
 			if (condition.isFailure(status)) {
 				throw new DeploymentException("Got failure status " + status + ": " + condition.getFailureMessage());
 			}

@@ -45,10 +45,12 @@ public class WriteStackOutputToFileTask extends DefaultTask {
 
 	@TaskAction
 	public void writeStackOutput() {
-		final DeployService deployService = new DeployService(config);
+		final DeployService deployService = new DeployService(config, getLogger());
 		final List<Output> output = deployService.getStackOutput();
 		final Properties prop = new Properties();
 		output.forEach(o -> prop.setProperty(o.getOutputKey(), o.getOutputValue()));
+
+		getLogger().info("Writing {} stack outputs to {}", prop.size(), outputFile);
 
 		try (Writer writer = new OutputStreamWriter(new FileOutputStream(outputFile), StandardCharsets.UTF_8)) {
 			prop.store(writer, "Output of stack " + config.getStackName());

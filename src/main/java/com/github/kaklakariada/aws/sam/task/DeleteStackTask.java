@@ -31,7 +31,7 @@ public class DeleteStackTask extends DefaultTask {
 
 	@TaskAction
 	public void uploadFileToS3() {
-		final DeployService deployService = new DeployService(config);
+		final DeployService deployService = new DeployService(config, getLogger());
 		deployService.deleteStack(config.getStackName());
 	}
 }

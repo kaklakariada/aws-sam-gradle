@@ -20,8 +20,7 @@ package com.github.kaklakariada.aws.sam.service;
 import java.util.Collection;
 import java.util.List;
 
-import org.gradle.api.logging.Logging;
-import org.slf4j.Logger;
+import org.gradle.api.logging.Logger;
 
 import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.model.AmazonCloudFormationException;
@@ -40,17 +39,18 @@ import com.github.kaklakariada.aws.sam.DeploymentException;
 
 public class CloudformationService {
 
-	private static final Logger LOG = Logging.getLogger(CloudformationService.class);
+	private final Logger logger;
 	private final AmazonCloudFormation cloudFormation;
 
-	public CloudformationService(AmazonCloudFormation cloudFormation) {
+	public CloudformationService(AmazonCloudFormation cloudFormation, Logger logger) {
 		this.cloudFormation = cloudFormation;
+		this.logger = logger;
 	}
 
 	public String createChangeSet(String changeSetName, String stackName, ChangeSetType changeSetType,
 			String templateBody, Collection<Parameter> parameters) {
-		LOG.info("Creating change set for stack {} with name {}, type {} and parameters {}", stackName, changeSetName,
-				changeSetType, parameters);
+		logger.info("Creating change set for stack {} with name {}, type {} and parameters {}", stackName,
+				changeSetName, changeSetType, parameters);
 		final CreateChangeSetRequest changeSetRequest = new CreateChangeSetRequest() //
 				.withCapabilities(Capability.CAPABILITY_IAM) //
 				.withStackName(stackName) //
@@ -59,19 +59,19 @@ public class CloudformationService {
 				.withChangeSetType(changeSetType) //
 				.withParameters(parameters).withTemplateBody(templateBody);
 		final CreateChangeSetResult result = cloudFormation.createChangeSet(changeSetRequest);
-		LOG.info("Change set created: {}", result);
+		logger.info("Change set created: {}", result);
 		return result.getId();
 	}
 
 	public boolean stackExists(String stackName) {
 		try {
 			return describeStack(stackName).stream() //
-					.peek(s -> LOG.info("Found stack {}", s)) //
+					.peek(s -> logger.info("Found stack {}", s)) //
 					.filter(s -> s.getStackName().equals(stackName)) //
 					.anyMatch(s -> !s.getStackStatus().equals("REVIEW_IN_PROGRESS"));
 		} catch (final AmazonCloudFormationException e) {
 			if (e.getStatusCode() == 400) {
-				LOG.trace("Got exception", e);
+				logger.trace("Got exception {}", e.getMessage(), e);
 				return false;
 			}
 			throw e;
@@ -92,11 +92,11 @@ public class CloudformationService {
 
 	public void executeChangeSet(String changeSetArn) {
 		cloudFormation.executeChangeSet(new ExecuteChangeSetRequest().withChangeSetName(changeSetArn));
-		LOG.info("Executing change set {}", changeSetArn);
+		logger.lifecycle("Executing change set {}", changeSetArn);
 	}
 
 	public void deleteStack(String stackName) {
-		LOG.info("Delete stack '{}'", stackName);
+		logger.info("Delete stack '{}'", stackName);
 		cloudFormation.deleteStack(new DeleteStackRequest().withStackName(stackName));
 	}
 }

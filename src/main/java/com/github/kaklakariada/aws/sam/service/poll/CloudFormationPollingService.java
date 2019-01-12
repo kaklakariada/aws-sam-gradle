@@ -17,6 +17,8 @@
  */
 package com.github.kaklakariada.aws.sam.service.poll;
 
+import org.gradle.api.logging.Logger;
+
 import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 
 public class CloudFormationPollingService {
@@ -28,8 +30,8 @@ public class CloudFormationPollingService {
 		this.pollingService = pollingService;
 	}
 
-	public CloudFormationPollingService(AmazonCloudFormation cloudFormation) {
-		this(cloudFormation, new StatusPollingService());
+	public CloudFormationPollingService(AmazonCloudFormation cloudFormation, Logger logger) {
+		this(cloudFormation, new StatusPollingService(logger));
 	}
 
 	public void waitForChangeSetReady(String changeSetArn) {

@@ -122,13 +122,14 @@ public class S3UploadTask extends DefaultTask {
 
 	private void transferFileToS3(final String key) {
 		final long fileSizeMb = file.length() / (1024 * 1024);
-		getLogger().info("Uploading {} MB from file {} to {}", fileSizeMb, file, getS3Url());
+		getLogger().lifecycle("Uploading {} MB from file {} to {}...", fileSizeMb, file, getS3Url());
 		final TransferManager transferManager = createTransferManager();
 		final Instant start = Instant.now();
 		final Upload upload = transferManager.upload(config.getDeploymentBucket(), key, file);
 		try {
 			upload.waitForCompletion();
-			getLogger().info("Uploaded {} to {} in {}", file, getS3Url(), Duration.between(start, Instant.now()));
+			final Duration uploadDuration = Duration.between(start, Instant.now());
+			getLogger().lifecycle("Uploaded {} to {} in {}", file, getS3Url(), uploadDuration);
 		} catch (final InterruptedException e) {
 			Thread.currentThread().interrupt();
 			throw new AssertionError("Upload interrupted", e);

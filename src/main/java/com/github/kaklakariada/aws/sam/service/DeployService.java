@@ -24,8 +24,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import org.gradle.api.logging.Logging;
-import org.slf4j.Logger;
+import org.gradle.api.logging.Logger;
 
 import com.amazonaws.services.cloudformation.AmazonCloudFormation;
 import com.amazonaws.services.cloudformation.AmazonCloudFormationClientBuilder;
@@ -36,8 +35,8 @@ import com.github.kaklakariada.aws.sam.config.SamConfig;
 import com.github.kaklakariada.aws.sam.service.poll.CloudFormationPollingService;
 
 public class DeployService {
-	private static final Logger LOG = Logging.getLogger(DeployService.class);
 
+	private final Logger logger;
 	private final CloudformationService cloudFormationService;
 	private final TemplateService templateService;
 	private final SamConfig config;
@@ -45,20 +44,21 @@ public class DeployService {
 	private final CloudFormationPollingService pollingService;
 
 	public DeployService(SamConfig config, CloudformationService cloudFormationService,
-			CloudFormationPollingService pollingService, TemplateService templateService) {
+			CloudFormationPollingService pollingService, TemplateService templateService, Logger logger) {
 		this.config = config;
 		this.cloudFormationService = cloudFormationService;
 		this.pollingService = pollingService;
 		this.templateService = templateService;
+		this.logger = logger;
 	}
 
-	public DeployService(SamConfig config, AmazonCloudFormation cloudFormation) {
-		this(config, new CloudformationService(cloudFormation), new CloudFormationPollingService(cloudFormation),
-				new TemplateService());
+	public DeployService(SamConfig config, AmazonCloudFormation cloudFormation, Logger logger) {
+		this(config, new CloudformationService(cloudFormation, logger),
+				new CloudFormationPollingService(cloudFormation, logger), new TemplateService(logger), logger);
 	}
 
-	public DeployService(SamConfig config) {
-		this(config, config.getAwsClientFactory().create(AmazonCloudFormationClientBuilder.standard()));
+	public DeployService(SamConfig config, Logger logger) {
+		this(config, config.getAwsClientFactory().create(AmazonCloudFormationClientBuilder.standard()), logger);
 	}
 
 	public void deploy(String templateBody, String codeUri, String swaggerDefinitionUri) {
@@ -81,8 +81,8 @@ public class DeployService {
 	}
 
 	private void logStackOutput() {
-		getStackOutput()
-				.forEach(output -> LOG.info("Stack output {} = {}", output.getOutputKey(), output.getOutputValue()));
+		getStackOutput().forEach(
+				output -> logger.lifecycle("Stack output {} = {}", output.getOutputKey(), output.getOutputValue()));
 	}
 
 	public List<Output> getStackOutput() {

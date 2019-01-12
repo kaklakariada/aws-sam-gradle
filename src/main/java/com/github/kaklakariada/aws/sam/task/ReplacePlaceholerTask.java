@@ -39,7 +39,7 @@ public class ReplacePlaceholerTask extends DefaultTask {
 
 	@TaskAction
 	public void replace() {
-		final TemplateService service = new TemplateService();
+		final TemplateService service = new TemplateService(getLogger());
 		final String content = service.loadFile(input.toPath());
 		final String result = service.replaceParameters(content, parameters);
 		service.writeFile(result, output.toPath());
