@@ -27,10 +27,10 @@ ext {
 }
 
 serverless {
-	currentStage = deployStage
+	activeStage = deployStage
 	defaultAwsProfile = 'default'
 	defaultAwsRegion = awsRegion
-	defaultDeploymentBucket = awsDeploymentBucket
+	defaultDeployBucket = awsDeploymentBucket
 	stages {
 		test {
 			// use default values
