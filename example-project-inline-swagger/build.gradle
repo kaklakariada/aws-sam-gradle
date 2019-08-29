@@ -9,6 +9,9 @@ repositories {
 
 version = '0.0.1'
 
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
 ext {
     deployStage = project.hasProperty('stage') ? project.properties['stage'] : 'test'
 }

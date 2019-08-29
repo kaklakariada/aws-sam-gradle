@@ -8,14 +8,14 @@ repositories {
    jcenter()
 }
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+sourceCompatibility = '11'
+targetCompatibility = '11'
 
 version = '0.6.1'
 group = 'com.github.kaklakariada.aws'
 
 ext {
-  awsApiVersion = '1.11.482'
+  awsApiVersion = '1.11.620'
   gradlePluginId = 'com.github.kaklakariada.aws-sam-deploy'
 }
 
