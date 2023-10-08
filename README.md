@@ -1,6 +1,10 @@
 # aws-sam-gradle
 Gradle plugin for deploying Serverless Java applications using AWS [Serverless Application Models (SAM)](https://github.com/awslabs/serverless-application-model) via CloudFormation templates.
 
+## ⚠️ This project is not maintained any more ⚠️
+
+Use AWS SAM or CDK instead.
+
 ## Usage
 
 ### Initial setup
